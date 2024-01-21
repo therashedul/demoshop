@@ -1,0 +1,24 @@
+composer create-project --prefer-dist laravel/laravel myshop
+cd democms
+composer require laravel/ui:*
+php artisan ui bootstrap
+php artisan ui bootstrap --auth
+
+https://laravelcollective.com/docs/5.8/html
+https://image.intervention.io/v2
+https://github.com/jorenvh/laravel-share
+https://www.itsolutionstuff.com/post/laravel-cashier-stripe-subscription-example-tutorialexample.html
+
+
+https://www.youtube.com/watch?v=0QbLhAYsbqA&ab_channel=CareerDevelopmentLab
+https://www.larashout.com/laravel-mix
+https://www.youtube.com/watch?v=PhuwlYrd-XU&ab_channel=StackLearner
+
+user:         superAdmin
+	admin
+	employe
+	supplier
+	coustomar
+
+https://preview.codecanyon.net/item/infypos-advanced-laravel-pos-system-with-inventory-management-point-of-sales-react-js-spa/full_screen_preview/38960688?_ga=2.215492311.1988345162.1683780345-1720345847.1652350935
+http://preview.codecanyon.net/item/lims-stock-manager-pro-with-pos/full_screen_preview/22256829?_ga=2.59255277.1988345162.1683780345-1720345847.1652350935

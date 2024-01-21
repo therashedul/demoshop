@@ -1,0 +1,11 @@
+h2 {
+    color: red;
+    font-size: 6rem;
+}
+
+h3 {
+    color: blue;
+    border: #ccc solid 2px;
+    padding: 10px;
+}
+
