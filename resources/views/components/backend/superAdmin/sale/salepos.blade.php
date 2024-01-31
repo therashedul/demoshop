@@ -1083,9 +1083,10 @@
     </div>
 </section>
 
-@push('scripts')
+
 
 <script type="text/javascript">
+alert("kk");
 
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
@@ -2716,4 +2717,4 @@ $('#product-table').DataTable( {
 });
 </script>
 <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-@endpush
+

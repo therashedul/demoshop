@@ -25,7 +25,7 @@ class CreateProductsTable extends Migration
             $table->string('product_cost')->nullable();
             $table->string('product_regular_price')->nullable();
             $table->string('product_sell_price')->nullable();
-
+            $table->string('qty_list')->nullable();
             $table->string('product_image')->nullable();
             $table->text('product_details')->nullable();
             $table->string('featured')->nullable();

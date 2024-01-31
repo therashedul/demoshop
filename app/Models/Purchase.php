@@ -11,29 +11,29 @@ class Purchase extends Model
     protected $table = 'purchases';
 
     protected $fillable =[
-        "reference_no",        
-        "warehouse_id",
-        "supplier_id",
-        "item",
-        "total_qty",
-        "total_discount",
-        "total_tax",
-        "total_cost",
-        "order_tax_rate",
-        "order_tax",
-        "order_discount",
-        "shipping_cost",
-        "grand_total",
-        "due_amount",
-        "paid_amount",
-        "purchase_status",
-        "payment_status",
+        'reference_no',
+        'warehouse_id',
+        'supplier_id',
+        'item',
+        'total_qty',
+        'total_discount',
+        'total_tax',
+        'total_cost',
+        'order_tax_rate',
+        'order_tax',
+        'order_discount',
+        'shipping_cost',
+        'grand_total',
+        'due_amount',
+        'paid_amount',
+        'purchase_status',
+        'payment_status',
         // 'expired_date',
-        "document",
-        "note",
+        'document',
+        'note',
 
-        "user_id",
-        "created_at"
+        'user_id',
+        'created_at'
     ];
 
     public function supplier()
@@ -53,9 +53,9 @@ class Purchase extends Model
 	public function getFillable() {
 		return $this->fillable;
 	}
-	
+
 	/**
-	 * @param mixed $fillable 
+	 * @param mixed $fillable
 	 * @return self
 	 */
 	public function setFillable($fillable): self {

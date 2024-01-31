@@ -3,6 +3,11 @@
 namespace App\Http\Servicecruds;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Mail\DeliveryDetails;
+use App\Mail\DeliveryChallan;
+use Mail;
+use \App\Traits\MailInfo;
+use Illuminate\Support\Facades\Cache;
 
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\{
@@ -17,6 +22,7 @@ use App\Models\{
 
 class Deliverycrud
 {
+    use MailInfo;
    // ========================Delivery===================
    public function deliveryindex( $request)
    {
@@ -135,7 +141,7 @@ class Deliverycrud
                        ->select('couriers.name')
                        ->get();
                    foreach ($couriars as $couriar) {
-                       $couriarId = $couriar->id;
+                       $couriarId = $couriar->name;
                    }
 
                    $username = DB::table('users')->find($row->user_id);

@@ -1,6 +1,7 @@
 @if(session()->has('not_permitted'))
   <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
 @endif
+
 <section class="forms">
     <div class="container-fluid">
         <div class="row">
@@ -106,7 +107,7 @@
                                                             // print_r($product_variant_data);
                                                         }
                                                         else{
-                                                            
+
                                                             $product_variant_id = null;
                                                         }
                                                         if($product_data->tax_method == 1){
@@ -149,10 +150,10 @@
                                                         $temp_unit_code = $unit_code = implode(",",$unit_code) . ',';
                                                         $temp_unit_operator = $unit_operator = implode(",",$unit_operator) .',';
                                                         $temp_unit_operation_value = $unit_operation_value =  implode(",",$unit_operation_value) . ',';
-                                                        $product_batch_data = \App\Models\ProductBatch::select('batch_no', 'expired_date')->find($product_sale->product_batch_id);  
+                                                        $product_batch_data = \App\Models\ProductBatch::select('batch_no', 'expired_date')->find($product_sale->product_batch_id);
                                                         @endphp
-                                                        <td>{{$product_data->product_name}} 
-                                                            <button type="button" class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal"> <i class="dripicons-document-edit"></i></button> 
+                                                        <td>{{$product_data->product_name}}
+                                                            <button type="button" class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal"> <i class="dripicons-document-edit"></i></button>
                                                             <input type="hidden" class="product-type" value="{{$product_data->product_type}}" />
                                                         </td>
                                                         <td>{{$product_data->product_code}}</td>
@@ -560,7 +561,7 @@
 
     var id = $('select[name="customer_id"]').val();
     var url = "{{ route('superAdmin.sale.getcustomergroup', ':id') }}";
-    var coustormelistUrl = url.replace(':id', id);  
+    var coustormelistUrl = url.replace(':id', id);
     $.get(coustormelistUrl, function(data) {
         customer_group_rate = (data / 100);
     });
@@ -606,7 +607,7 @@
     $('select[name="customer_id"]').on('change', function() {
         var id = $(this).val();
         var url = "{{ route('superAdmin.sale.getcustomergroup', ':id') }}";
-        var coustormelistUrl = url.replace(':id', id); 
+        var coustormelistUrl = url.replace(':id', id);
         $.get(coustormelistUrl, function(data) {
             customer_group_rate = (data / 100);
         });
@@ -758,7 +759,7 @@
 
         var id = product_id;
         var url = "{{ route('superAdmin.sale.checkAvailability', ':id') }}";
-        var getUrl = url.replace(':id', id) + '/' + $(this).val() + '/' + warehouse_id ;  
+        var getUrl = url.replace(':id', id) + '/' + $(this).val() + '/' + warehouse_id ;
 
         $.get(getUrl, function(data) {
             if(data['message'] != 'ok') {
@@ -857,7 +858,7 @@
                     // cols += '<td><button type="button" class="ibtnDel btn btn-md btn-danger">{{trans("delete")}}</button></td>';
                     // cols += '<input type="hidden" class="product-code" name="product_code[]" value="' + data[1] + '"/>';
                     // cols += '<input type="hidden" class="product-id" name="product_id[]" value="' + data[9] + '"/>';
-                    
+
                     // cols += '<input type="hidden" class="sale-unit" name="sale_unit[]" value="' + temp_unit_name[0] + '"/>';
                     // cols += '<input type="hidden" class="net_unit_price" name="net_unit_price[]" />';
                     // cols += '<input type="hidden" class="discount-value" name="discount[]" />';
@@ -1122,7 +1123,7 @@
         var shipping_cost = parseFloat($('input[name="shipping_cost"]').val());
         var order_discount_type = $('select[name="order_discount_type"]').val();
         var order_discount_value = parseFloat($('input[name="order_discount_value"]').val());
-    
+
         if (!order_discount_value)
             order_discount_value = 0.00;
 

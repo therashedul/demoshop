@@ -19,7 +19,7 @@ class CreatePaymentsTable extends Migration
             $table->integer('purchase_id')->nullable();
             $table->integer('user_id')->nullable();
             $table->integer('cash_register_id')->nullable();
-            $table->integer('account_id')->nullable();
+            $table->string('account_id')->nullable();
             $table->string('paying_method')->nullable();
             $table->string('payment_reference')->nullable();
             $table->integer('used_points')->nullable();

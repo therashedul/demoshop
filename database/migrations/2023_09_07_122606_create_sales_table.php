@@ -19,8 +19,8 @@ class CreateSalesTable extends Migration
             $table->integer('customer_id');
             $table->integer('warehouse_id');
             $table->integer('biller_id');
-            $table->integer('coupon_id');
-            $table->integer('coupon_discount');
+            $table->integer('coupon_id')->nullable();
+            $table->integer('coupon_discount')->nullable();
             $table->integer('cash_register_id');
             $table->string('product_variant_id')->nullable();
             $table->integer('user_id');
@@ -32,7 +32,7 @@ class CreateSalesTable extends Migration
             $table->double('grand_total');
             $table->double('order_tax_rate')->nullable();
             $table->double('order_tax')->nullable();
-            $table->integer('order_discount_value');
+            $table->integer('order_discount_value')->nullable();
             $table->string('order_discount_type')->nullable();
             $table->double('order_discount')->nullable();
             $table->double('shipping_cost')->nullable();

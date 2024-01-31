@@ -106,7 +106,7 @@
                             </label>
                             <div class="col-md-12 col-sm-12 ">
                                 <input type="text" name="operation_value" id="operation_value"
-                                    class="form-control up_operation_value operation_value" required />
+                                    class="form-control up_operation_value add_operation_value" required />
                             </div>
                         </div>
 
@@ -439,7 +439,7 @@
                         first: "First",
                         last: "Last",
                         next: '&#8594;', // or '→'
-                        previous: '&#8592;' // or '←' 
+                        previous: '&#8592;' // or '←'
                     },
                     processing: '<span>Processing...</span>',
 
@@ -482,8 +482,7 @@
 
                 let unit_code = $('.unit_code').val();
                 let operator = $('.operator').val();
-                let operaton_value = $('.operaton_value').val();
-
+                let operation_value = $('.add_operation_value').val();
                 let status = $(".status").is(':checked') ? 1 : 0;
 
                 let dataall = {
@@ -491,7 +490,7 @@
                     'short_name': short_name,
                     'unit_code': unit_code,
                     'operator': operator,
-                    'operaton_value': operaton_value,
+                    'operation_value': operation_value,
 
                     'status': status,
 

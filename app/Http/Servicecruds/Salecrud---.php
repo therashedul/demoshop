@@ -190,7 +190,7 @@ class Salecrud
                         $updateButton = '<a href="' . url('superAdmin/sale/' . $row->id . '/create') . '" class="btn btn-link"><i class="fas fa-edit"></i>' . trans('edit') . '</a>';
                     }
                     // $updateButton = ($row->sale_status != 3) ? '<a href="' . route('superAdmin.sale.edit', $row->id) . '" class="btn btn-link"><i class="fas fa-edit"></i> ' . trans('Edit') . '</a>' : '<a href="' . route('superAdmin.sale/' . $row->id . '/create') . '" class="btn btn-link"><i class="dripicons-document-edit"></i> ' . trans('edit') . '</a>';
-    
+
                     // Generate Invoice
                     $generateInvoice = '<a href="' . route('superAdmin.sale.invoice', $row->id) . '" class="btn btn-link"><i class="fa fa-copy"></i> ' . trans('Generate Invoice') . '</a>';
 
@@ -214,15 +214,15 @@ class Salecrud
                     </button>
                     <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default menuScrolling" user="menu">
                         <li>' . $updateButton . '</li>
-                    
-                        <li>' . $viewpayment . '</li> 
-                    
+
+                        <li>' . $viewpayment . '</li>
+
                         <li>' . $generateInvoice . '</li>
-                
-                        <li>' . $addpayment . '</li> 
-                       
-                        <li>' . $addDelevery . '</li> 
-                    
+
+                        <li>' . $addpayment . '</li>
+
+                        <li>' . $addDelevery . '</li>
+
                         <li>' . $deleteButton . '</li>
                     </ul>
                 </div>';
@@ -1048,7 +1048,7 @@ class Salecrud
     //                         $data['customer_stripe_id'] = $customer->id;
     //                     }
     //                     else {
-    //                         $customer_id = 
+    //                         $customer_id =
     //                         $lims_payment_with_credit_card_data->customer_stripe_id;
 
     //                         $charge = \Stripe\Charge::create([
@@ -1958,7 +1958,7 @@ class Salecrud
         //     $paypal_data['total'] = $total;
         //     $response = $provider->setExpressCheckout($paypal_data);
         //     return redirect($response['paypal_link']);
-        // }   
+        // }
         elseif ($data['edit_paid_by_id'] == 6) {
             $lims_payment_data->paying_method = 'Deposit';
             $lims_customer_data->expense += $data['edit_amount'];
@@ -3016,7 +3016,7 @@ class Salecrud
 
                     // View Button
                     $viewButton =
-                        '<a href="javascript:void(0)" style="box-shadow:none;" class="btn btn-link view" 
+                        '<a href="javascript:void(0)" style="box-shadow:none;" class="btn btn-link view"
                             data-id = "' . $row->id . '"
                             data-date = "' . date('d-m-Y', strtotime($row->created_at)) . '"
                             data-reference_no = "' . $row->reference_no . '"
@@ -3025,18 +3025,18 @@ class Salecrud
                             data-coustomername = "' . $row->customer->name . '"
                             data-coustomerphone = "' . $row->customer->phone_number . '"
                             data-coustomeremail = "' . $row->customer->email . '"
-                            data-coustomeraddress = "' . $row->customer->address . '"   
-                            
+                            data-coustomeraddress = "' . $row->customer->address . '"
+
                             data-billername = "' . $row->biller->name . '"
                             data-billerphone = "' . $row->biller->phone_number . '"
                             data-billeremail = "' . $row->biller->email . '"
-                            data-billeraddress = "' . $row->biller->address . '"                      
+                            data-billeraddress = "' . $row->biller->address . '"
 
-                            
+
                             data-warehouse_name = "' . $row->warehouse->name . '"
                             data-warehouse_phone = "' . $row->warehouse->phone . '"
                             data-warehouse_address = "' . $row->warehouse->address . '"
-                         
+
                             data-total_discount = "' . $row->total_discount . '"
                             data-order_tax = "' . $row->order_tax . '"
                             data-total_cost = "' . $row->total_price . '"
@@ -3048,7 +3048,7 @@ class Salecrud
 
                             data-user_name = "' . $row->user->name . '"
                             data-user_email = "' . $row->user->email . '"
-                
+
                             ><i class="fa fa-eye"></i> ' . trans('View') . '</a>';
                     $updateButton = '<a href="' . route('superAdmin.return-sale.edit', $row->id) . '" class="btn btn-link"><i class="fas fa-edit"></i> ' . trans('Edit') . '</a>';
 
@@ -3062,15 +3062,15 @@ class Salecrud
                                     </button>
                                     <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default menuScrolling" user="menu">
                                         <li>' . $updateButton . '</li>
-                                    
+
                                         <li>' . $viewButton . '</li>
-                                    
+
                                         <li>' . $deleteButton . '</li>
                                     </ul>
                                 </div>';
 
                     // return $nasted ;
-    
+
                     return $updateButton . " " . $deleteButton . "" . $viewButton;
                 })
                 ->escapeColumns([])

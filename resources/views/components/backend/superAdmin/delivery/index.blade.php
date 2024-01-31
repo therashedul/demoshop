@@ -302,7 +302,7 @@
                             $referenceNo = DNS2D::getBarcodePNG($reference, 'QRCODE');
                                 echo $referenceNo;
                             @endphp";
-            // alert(barcode);
+            alert(barcode);
 
             var htmlfooter = '<div class="col-md-4 form-group"><p>Prepared By: ' +  userName + '</p></div>';
             htmlfooter += '<div class="col-md-4 form-group"><p>Delivered By: ' + delivered_by + '</p></div>';

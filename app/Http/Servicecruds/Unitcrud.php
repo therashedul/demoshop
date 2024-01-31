@@ -47,22 +47,22 @@ class Unitcrud
                     }
                 })
                 ->addColumn('action', function ($row) {
-                    // Update Button              
-    
-                    $updateButton = '<a href="javascript:void(0)" data-toggle="tooltip"  
+                    // Update Button
+
+                    $updateButton = '<a href="javascript:void(0)" data-toggle="tooltip"
                             data-toggle="modal"
                             data-target="#ajaxModelexa"
-                            data-id="' . $row->id . '" 
+                            data-id="' . $row->id . '"
                             data-base_unit="' . $row->base_unit . '"
-                            data-short_name="' . $row->short_name . '"    
+                            data-short_name="' . $row->short_name . '"
                             data-unit_code="' . $row->unit_code . '"
-                            data-operator="' . $row->operator . '"      
-                            data-operation_value="' . $row->operation_value . '"                                           
-                            data-status="' . $row->status . '" 
+                            data-operator="' . $row->operator . '"
+                            data-operation_value="' . $row->operation_value . '"
+                            data-status="' . $row->status . '"
                             data-original-title="Edit" class="edit btn btn-primary btn-sm submitUpImage editPost "> <i class="fas fa-edit"></i></a>';
 
                     // Delete Button
-    
+
                     $deleteButton = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteunit"><i class="fa fa-trash"></i></a>';
                     return $updateButton . " " . $deleteButton;
 

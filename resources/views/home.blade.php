@@ -1,4 +1,4 @@
-@extends('backend.layouts.deshboard')
+@extends('layouts.deshboard')
 @section('content')
 <div class="container">
     <div class="row justify-content-center">

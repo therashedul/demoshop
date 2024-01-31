@@ -25,7 +25,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($lims_customer_group_all as $key=>$customer_group)
+                @foreach($limscustomergroupall as $key=>$customer_group)
                 <tr data-id="{{$customer_group->id}}">
                     <td>{{$key}}</td>
                     <td>{{ $customer_group->name }}</td>
@@ -90,7 +90,7 @@
 <div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
 <div role="document" class="modal-dialog">
   <div class="modal-content">
-    
+
     {!! Form::open(['route' => ['superAdmin.coustomergroup.update'], 'method' => 'POST']) !!}
     <div class="modal-header">
       <h5 id="exampleModalLabel" class="modal-title">{{trans('Update Customer Group')}}</h5>
@@ -176,7 +176,7 @@
       }
       return false;
   }
- 
+
 
         $('body').on('click', '.open-EditCustomerGroupDialog', function() {
             var id = $(this).data('id').toString();

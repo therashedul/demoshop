@@ -9,7 +9,7 @@
 @endif
 @if(!empty($general_setting->theme))
       @php
-      
+
         if($general_setting->theme == 'default.css'){
           $color = '#733686';
           $color_rgba = 'rgba(115, 54, 134, 0.8)';
@@ -26,9 +26,9 @@
             $color = '#34495e';
             $color_rgba = 'rgba(52, 73, 94, 0.8)';
         }
-      
+
       @endphp
-   
+
       <div class="row">
         <div class="container-fluid">
           <div class="col-md-12">
@@ -119,12 +119,12 @@
                     <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label1="{{trans('Purchase')}}" data-label2="{{trans('revenue')}}" data-label3="{{trans('Expense')}}" width="100" height="95"> </canvas>
                 </div>
               </div>
-            </div>        
+            </div>
           </div>
         </div>
 
         <div class="container-fluid">
-          <div class="row">      
+          <div class="row">
             <div class="col-md-12">
               <div class="card">
                 <div class="card-header d-flex align-items-center">

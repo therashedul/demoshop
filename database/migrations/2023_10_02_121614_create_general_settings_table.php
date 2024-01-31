@@ -18,8 +18,16 @@ class CreateGeneralSettingsTable extends Migration
             $table->string('site_title')->nullable();
             $table->string('site_logo')->nullable();
             $table->string('is_rtl')->nullable();
+            $table->string('is_zatca')->nullable();
+            $table->string('free_trial_limit')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('expiry_date')->nullable();
+            $table->string('timezone')->nullable();
+            $table->string('without_stock')->nullable();
             $table->integer('currency')->nullable();
-            $table->integer('currency_position')->nullable();
+            $table->integer('decimal')->nullable();
+            $table->string('currency_position')->nullable();
             $table->string('staff_access')->nullable();
             $table->string('date_format')->nullable();
             $table->string('theme')->nullable();

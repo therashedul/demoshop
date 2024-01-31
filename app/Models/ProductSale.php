@@ -18,12 +18,14 @@ class ProductSale extends Model
         'imei_number', 
         'qty', 
         'sale_unit_id', 
+        'return_qty',
         'net_unit_price', 
         'discount', 
         'tax_rate', 
         'tax', 
         'total'
-        ];
+        ];     
+
         public function ProductVariant()
         {
             return $this->belongsTo('App\Models\ProductVariant');

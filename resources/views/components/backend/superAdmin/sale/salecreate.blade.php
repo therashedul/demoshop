@@ -94,7 +94,7 @@
                                                                 @foreach ($limscustomerlist as $customer)
                                                                     @php
                                                                         $deposit[$customer->id] = $customer->deposit - $customer->expense;
-                                                                        
+
                                                                         $points[$customer->id] = $customer->points;
                                                                     @endphp
                                                                     <option value="{{ $customer->id }}">
@@ -513,7 +513,7 @@
                                     <div class="row">
                                         <div class="col-md-6 form-group warehouse-section">
                                             <label>{{ trans('Warehouse') }} *</strong> </label>
-                                            <select required name="warehouse_id" class="selectpicker form-control"
+                                            <select required name="warehouse_id" class="form-control"
                                                 data-live-search="true" data-live-search-style="begins"
                                                 title="Select warehouse...">
                                                 @foreach ($limswarehouselist as $warehouse)
@@ -615,6 +615,7 @@
     <script src="https://salepropos.com/salepro/service-worker.js"></script>
 
     <script type="text/javascript">
+
         // $.getScript("public/coustom.js");
         // $.getScript("{{ asset('coustom.js') }}");
         $("ul#sale").siblings('a').attr('aria-expanded', 'true');
@@ -923,12 +924,12 @@
                         $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ') .qty').val(qty);
                         pos = product_code.indexOf(data[1]);
                         if (!data[11] && product_warehouse_price[pos]) {
-                            product_price[rowindex] = parseFloat(product_warehouse_price[pos] * currency[
-                                'exchange_rate']) + parseFloat(product_warehouse_price[pos] * currency[
+                            product_price[rowindex] = parseFloat(product_warehouse_price[pos] [
+                                'exchange_rate']) + parseFloat(product_warehouse_price[pos] [
                                 'exchange_rate'] * customer_group_rate);
                         } else {
-                            product_price[rowindex] = parseFloat(data[2] * currency['exchange_rate']) +
-                                parseFloat(data[2] * currency['exchange_rate'] * customer_group_rate);
+                            product_price[rowindex] = parseFloat(data[2] ) +
+                                parseFloat(data[2]  * customer_group_rate);
                         }
                         flag = 0;
                         checkQuantity(String(qty), true);
@@ -982,9 +983,7 @@
                         rowindex = newRow.index();
 
                         if (!data[11] && product_warehouse_price[pos]) {
-                            product_price.splice(rowindex, 0, parseFloat(product_warehouse_price[pos] *
-                                currency['exchange_rate']) + parseFloat(product_warehouse_price[pos] *
-                                currency['exchange_rate'] * customer_group_rate));
+                            product_price.splice(rowindex, 0, parseFloat(product_warehouse_price[pos] ) + parseFloat(product_warehouse_price[pos]  * customer_group_rate));
                         } else {
                             product_price.splice(rowindex, 0, parseFloat(data[2]) +
                                 parseFloat(data[2] * customer_group_rate));
@@ -1073,9 +1072,9 @@
                         pos = product_code.indexOf($('table.order-list tbody tr:nth-child(' + (rowindex +
                                 1) +
                             ') .product-code').val());
-                        product_price[rowindex] = parseFloat(data[0] * currency['exchange_rate']) +
+                        product_price[rowindex] = parseFloat(data[0] ) +
                             parseFloat(
-                                data[0] * currency['exchange_rate'] * customer_group_rate);
+                                data[0]  * customer_group_rate);
                     }
                 });
             }

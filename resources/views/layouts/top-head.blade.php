@@ -72,7 +72,7 @@
           @yield('content')
       </div>
 
-    
+
     <!-- end supplier modal -->
     <script type="text/javascript" src="@php echo asset('vendor/jquery/jquery.min.js') @endphp"></script>
     <script type="text/javascript" src="@php echo asset('vendor/jquery/jquery-ui.min.js') @endphp"></script>
@@ -104,7 +104,7 @@
     <script type="text/javascript" src="@php echo asset('vendor/datatable/dataTables.bootstrap4.min.js') @endphp"></script>
 
     @stack('scripts')
-    
+
     <script>
         if ('serviceWorker' in navigator ) {
             window.addEventListener('load', function() {
@@ -135,7 +135,7 @@
               style: 'btn-link',
           });
 
-       
+
 
         $("li#notification-icon").on("click", function (argument) {
               $.get('notifications/mark-as-read', function(data) {

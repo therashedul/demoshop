@@ -74,6 +74,16 @@ Route::group(['prefix' => 'superAdmin', 'as' => 'superAdmin.','middleware' => ['
 	Route::post('white.update', [App\Http\Controllers\SuperAdminController::class, 'whiteupdate'])->name('white.update');
 	Route::get('white.delete.{id}', [App\Http\Controllers\SuperAdminController::class, 'whitedestroy'])->name('white.delete');
 
+    // custom-fields
+    Route::get('/custom-fields', [App\Http\Controllers\SuperAdminController::class, 'customindex'])->name('custom-fields');
+	Route::get('custom-fields.create', [App\Http\Controllers\SuperAdminController::class, 'customcreate'])->name('custom-fields.create');
+	Route::post('custom-fields.store', [App\Http\Controllers\SuperAdminController::class, 'customstore'])->name('custom-fields.store');
+	Route::get('custom-fields.edit.{id}', [App\Http\Controllers\SuperAdminController::class, 'customedit'])->name('custom-fields.edit');
+	Route::put('custom-fields.update.{id}', [App\Http\Controllers\SuperAdminController::class, 'customupdate'])->name('custom-fields.update');
+	Route::Delete('custom-fields.destroy.{id}', [App\Http\Controllers\SuperAdminController::class, 'destroy'])->name('custom-fields.destroy');
+
+    // Route::resource('custom-fields', CustomFieldController::class);
+
     // Black list
 	Route::get('/black', [App\Http\Controllers\SuperAdminController::class, 'black'])->name('black');
 	Route::get('black.create', [App\Http\Controllers\SuperAdminController::class, 'blackcreate'])->name('black.create');
@@ -693,13 +703,9 @@ Route::group(['prefix' => 'superAdmin', 'as' => 'superAdmin.','middleware' => ['
 
 
 
-    // Route::get('setting/general_setting', 'SettingController@generalSetting')->name('setting.general');
-	// Route::post('setting/general_setting_store', 'SettingController@generalSettingStore')->name('setting.generalStore');
 
-	// Route::get('setting/reward-point-setting', 'SettingController@rewardPointSetting')->name('setting.rewardPoint');
-	// Route::post('setting/reward-point-setting_store', 'SettingController@rewardPointSettingStore')->name('setting.rewardPointStore');
 
-	// Route::get('backup', 'SettingController@backup')->name('setting.backup');
+
 	// Route::get('setting/mail_setting', 'SettingController@mailSetting')->name('setting.mail');
 	// Route::get('setting/sms_setting', 'SettingController@smsSetting')->name('setting.sms');
 	// Route::get('setting/createsms', 'SettingController@createSms')->name('setting.createSms');

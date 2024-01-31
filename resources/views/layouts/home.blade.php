@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    
     @include('asset.homeasset.header')
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript">
         var startTime = new Date();
     </script>
-
 </head>
-
 <body class="hold-transition sidebar-mini layout-fixed" onbeforeunload="MyFunction();">
     <div class="wrapper">
         <!-- Preloader -->
@@ -22,7 +16,7 @@
 
         <!-- Navbar -->
         @include('asset.homeasset.nav')
-        
+
         <!-- /.navbar -->
         <!-- Main Sidebar Container -->
         @include('asset.homeasset.top')

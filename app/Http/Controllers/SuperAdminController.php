@@ -112,6 +112,7 @@ use App\Http\Servicecruds\{
 // use App\Models\ImageUpload;
 use App\Models\{
     Account,
+    CustomField,
     Adjustment,
     ProductAdjustment,
     Supplier,
@@ -1599,8 +1600,19 @@ class SuperAdminController extends Controller
     // ======================== Super admin===================
     public function superadminGeneralSetting()
     {
-        $lims_general_setting_data = GeneralSetting::latest()->first();
-        return view('superadmin.setting.superadmin_setting', compact('lims_general_setting_data'));
+
+        // dd("kk");
+      $lims_general_setting_data = GeneralSetting::latest()->first();
+      $lims_account_list = Account::where('is_active', true)->get();
+      // $lims_currency_list = Currency::get();
+      $zones_array = array();
+      $timestamp = time();
+      foreach (timezone_identifiers_list() as $key => $zone) {
+          date_default_timezone_set($zone);
+          $zones_array[$key]['zone'] = $zone;
+          $zones_array[$key]['diff_from_GMT'] = 'UTC/GMT ' . date('P', $timestamp);
+      }
+      return view('superadmin.setting.superadmin_setting', compact('lims_general_setting_data', 'lims_account_list', 'zones_array'));
     }
 
     public function superadminGeneralSettingStore(Request $request)
@@ -1610,56 +1622,81 @@ class SuperAdminController extends Controller
             'og_image' => 'image|mimes:jpg,jpeg,png|max:100000',
         ]);
         $data = $request->except('site_logo');
-        //return $data;
+        // return $data;
         if(isset($data['is_rtl']))
             $data['is_rtl'] = true;
         else
             $data['is_rtl'] = false;
         $general_setting = GeneralSetting::latest()->first();
-        $general_setting->id = 1;
-        $general_setting->site_title = $data['site_title'];
-        $general_setting->is_rtl = $data['is_rtl'];
-        $general_setting->phone = $data['phone'];
-        $general_setting->email = $data['email'];
-        $general_setting->free_trial_limit = $data['free_trial_limit'];
-        $general_setting->date_format = $data['date_format'];
-        $general_setting->expiry_date = $data['expiry_date'];
-        // $general_setting->dedicated_ip = $data['dedicated_ip'];
-        // $general_setting->currency = $data['currency'];
-        $general_setting->developed_by = $data['developed_by'];
-        $logo = $request->site_logo;
-        // $general_setting->meta_title = $data['meta_title'];
-        // $general_setting->meta_description = $data['meta_description'];
-        // $general_setting->og_title = $data['og_title'];
-        // $general_setting->og_description = $data['og_description'];
-        // $general_setting->chat_script = $data['chat_script'];
-        // $general_setting->ga_script = $data['ga_script'];
-        // $general_setting->fb_pixel_script = $data['fb_pixel_script'];
-        // $general_setting->active_payment_gateway = implode(",", $data['active_payment_gateway']);
-        // $general_setting->stripe_public_key = $data['stripe_public_key'];
-        // $general_setting->stripe_secret_key = $data['stripe_secret_key'];
-        // $general_setting->paypal_client_id = $data['paypal_client_id'];
-        // $general_setting->paypal_client_secret = $data['paypal_client_secret'];
-        // $general_setting->razorpay_number = $data['razorpay_number'];
-        // $general_setting->razorpay_key = $data['razorpay_key'];
-        // $general_setting->razorpay_secret = $data['razorpay_secret'];
-        // $og_image = $request->og_image;
-        if ($logo) {
-            $this->fileDelete('landlord/images/logo/', $general_setting->site_logo);
-
-            $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
-            $logoName = date("Ymdhis") . '.' . $ext;
-            $logo->move('public/landlord/images/logo', $logoName);
-            $general_setting->site_logo = $logoName;
+        if (!empty($general_setting)) {
+            $general_setting->id = 1;
+            if(isset($data['is_zatca'])) {
+                $general_setting->is_zatca = true;
+            }
+            else{
+                $general_setting->is_zatca = false;
+            }
+            $general_setting->site_title = $data['site_title'];
+            $general_setting->is_rtl = $data['is_rtl'];
+            $general_setting->phone = $data['phone'];
+            $general_setting->company_name = $data['company_name'];
+            $general_setting->email = $data['email'];
+            $general_setting->free_trial_limit = $data['free_trial_limit'];
+            $general_setting->date_format = $data['date_format'];
+            $general_setting->expiry_date = $data['expiry_date'];
+            $general_setting->without_stock = $data['without_stock'];
+            $general_setting->staff_access = $data['staff_access'];
+            $general_setting->state = $data['state'];
+            $general_setting->staff_access = $data['staff_access'];
+            $general_setting->currency_position = $data['currency_position'];
+            $general_setting->invoice_format = $data['invoice_format'];
+            // $general_setting->dedicated_ip = $data['dedicated_ip'];
+            // $general_setting->currency = $data['currency'];
+            $general_setting->developed_by = $data['developed_by'];
+            $logo = $request->site_logo;
+            $logo = $request->site_logo;
+            if ($logo) {
+                $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
+                $logoName = date("Ymdhis") . '.' . $ext;
+                $logo->move('public/logo', $logoName);
+                $general_setting->site_logo = $logoName;
+            }
+        } else {
+              $general_setting = new GeneralSetting();
+            $general_setting->id = 1;
+            if(isset($data['is_zatca'])) {
+                $general_setting->is_zatca = true;
+            }
+            else{
+                $general_setting->is_zatca = false;
+            }
+            $general_setting->site_title = $data['site_title'];
+            $general_setting->is_rtl = $data['is_rtl'];
+            $general_setting->phone = $data['phone'];
+            $general_setting->company_name = $data['company_name'];
+            $general_setting->email = $data['email'];
+            $general_setting->free_trial_limit = $data['free_trial_limit'];
+            $general_setting->date_format = $data['date_format'];
+            $general_setting->expiry_date = $data['expiry_date'];
+            $general_setting->without_stock = $data['without_stock'];
+            $general_setting->state = $data['state'];
+            $general_setting->staff_access = $data['staff_access'];
+            $general_setting->currency_position = $data['currency_position'];
+            $general_setting->invoice_format = $data['invoice_format'];
+            // $general_setting->dedicated_ip = $data['dedicated_ip'];
+            // $general_setting->currency = $data['currency'];
+            $general_setting->developed_by = $data['developed_by'];
+            $logo = $request->site_logo;
+            $logo = $request->site_logo;
+            if ($logo) {
+                $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
+                $logoName = date("Ymdhis") . '.' . $ext;
+                $logo->move('public/logo', $logoName);
+                $general_setting->site_logo = $logoName;
+            }
         }
-        // if ($og_image) {
-        //     $this->fileDelete('landlord/images/og-image/', $general_setting->og_image);
 
-        //     $ext = pathinfo($og_image->getClientOriginalName(), PATHINFO_EXTENSION);
-        //     $og_image_name = date("Ymdhis") . '.' . $ext;
-        //     $og_image->move('public/landlord/images/og-image/', $og_image_name);
-        //     $general_setting->og_image = $og_image_name;
-        // }
+
         $this->cacheForget('general_setting');
         $general_setting->save();
         return redirect()->back()->with('message', 'Data updated successfully');
@@ -1673,13 +1710,7 @@ class SuperAdminController extends Controller
 
     public function superadminMailSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $data = $request->all();
-        $mail_setting = MailSetting::latest()->first();
-        if(!$mail_setting)
-            $mail_setting = new MailSetting;
         $mail_setting->driver = $data['driver'];
         $mail_setting->host = $data['host'];
         $mail_setting->port = $data['port'];
@@ -2697,5 +2728,194 @@ class SuperAdminController extends Controller
     public function getipstore(Request $request)
     {
         return (new Settingcrud)->getipstore($request);
+    }
+
+    // ==========================custom field
+    public function customindex()
+    {
+
+            $lims_custom_field_all = CustomField::orderBy('id', 'desc')->get();
+            return view('superadmin.custom_field.index', compact('lims_custom_field_all'));
+
+    }
+
+    public function customcreate()
+    {
+
+            return view('superadmin.custom_field.create');
+
+    }
+
+    public function customstore(Request $request)
+    {
+        $data = $request->all();
+        //adding column to specific database
+        if($data['belongs_to'] == 'sale')
+            $table_name = 'sales';
+        elseif($data['belongs_to'] == 'purchase')
+            $table_name = 'purchases';
+        elseif($data['belongs_to'] == 'product')
+            $table_name = 'products';
+        elseif($data['belongs_to'] == 'customer')
+            $table_name = 'customers';
+
+        $column_name = str_replace(" ", "_", strtolower($data['name']));
+
+        if($data['type'] == 'number')
+            $data_type = 'double';
+        elseif($data['type'] == 'textarea')
+            $data_type = 'text';
+        else
+            $data_type = 'varchar(255)';
+        $sqlStatement = "ALTER TABLE ". $table_name . " ADD " . $column_name . " " . $data_type;
+        if($data['default_value_1']) {
+            $sqlStatement .= " DEFAULT '" . $data['default_value_1'] . "'";
+            $data['default_value'] = $data['default_value_1'];
+        }
+        elseif($data['default_value_2']) {
+            $sqlStatement .= " DEFAULT '" . $data['default_value_2'] . "'";
+            $data['default_value'] = $data['default_value_2'];
+        }
+        DB::insert($sqlStatement);
+        //adding data to custom fields table
+        if(isset($data['is_table']))
+            $data['is_table'] = true;
+        else
+            $data['is_table'] = false;
+
+        if(isset($data['is_invoice']))
+            $data['is_invoice'] = true;
+        else
+            $data['is_invoice'] = false;
+
+        if(isset($data['is_required']))
+            $data['is_required'] = true;
+        else
+            $data['is_required'] = false;
+
+        if(isset($data['is_admin']))
+            $data['is_admin'] = true;
+        else
+            $data['is_admin'] = false;
+
+        if(isset($data['is_disable']))
+            $data['is_disable'] = true;
+        else
+            $data['is_disable'] = false;
+        CustomField::create($data);
+        return redirect()->route('superAdmin.custom-fields')->with('message', 'Custom Field created successfully');
+    }
+
+
+
+    public function customedit($id)
+    {
+
+            $custom_field_data = CustomField::find($id);
+            return view('superadmin.custom_field.edit', compact('custom_field_data'));
+
+    }
+
+    public function customupdate(Request $request, $id)
+    {
+        $data = $request->all();
+        $lims_custom_field_data = CustomField::find($id);
+        if($data['belongs_to'] == 'sale')
+            $table_name = 'sales';
+        elseif($data['belongs_to'] == 'product')
+            $table_name = 'products';
+        elseif($data['belongs_to'] == 'purchase')
+            $table_name = 'purchases';
+        elseif($data['belongs_to'] == 'customer')
+            $table_name = 'customers';
+        $column_name = str_replace(" ", "_", strtolower($data['name']));
+        if($data['type'] == 'number')
+            $data_type = 'double';
+        elseif($data['type'] == 'textarea')
+            $data_type = 'text';
+        else
+            $data_type = 'varchar(255)';
+
+        if($data['name'] == $lims_custom_field_data->name)
+            $action = " MODIFY ";
+        else
+            $action = " RENAME ";
+        //deleting previous custom column if necessary
+        if($data['belongs_to'] != $lims_custom_field_data->belongs_to) {
+            if($lims_custom_field_data->belongs_to == 'sale')
+                $old_table_name = 'sales';
+            elseif($lims_custom_field_data->belongs_to == 'purchase')
+                $old_table_name = 'purchases';
+            elseif($lims_custom_field_data->belongs_to == 'product')
+                $old_table_name = 'products';
+            elseif($lims_custom_field_data->belongs_to == 'customer')
+                $old_table_name = 'customers';
+            $column_name = str_replace(" ", "_", strtolower($lims_custom_field_data->name));
+            $sqlStatement = "ALTER TABLE ". $old_table_name . " DROP COLUMN " . $column_name;
+            DB::insert($sqlStatement);
+            $action = " ADD ";
+        }
+        elseif($data['type'] == 'number' && $data['type'] != $lims_custom_field_data->type) {
+            $column_name = str_replace(" ", "_", strtolower($lims_custom_field_data->name));
+            $sqlStatement = "ALTER TABLE ". $table_name . " DROP COLUMN " . $column_name;
+            DB::insert($sqlStatement);
+            $action = " ADD ";
+        }
+        //adding column to specific database
+        $sqlStatement = "ALTER TABLE ". $table_name . $action . $column_name . " " . $data_type;
+        if($data['default_value_1']) {
+            $sqlStatement .= " DEFAULT '" . $data['default_value_1'] . "'";
+            $data['default_value'] = $data['default_value_1'];
+        }
+        elseif($data['default_value_2']) {
+            $sqlStatement .= " DEFAULT '" . $data['default_value_2'] . "'";
+            $data['default_value'] = $data['default_value_2'];
+        }
+        DB::insert($sqlStatement);
+        //updating data to custom fields table
+        if(isset($data['is_table']))
+            $data['is_table'] = true;
+        else
+            $data['is_table'] = false;
+
+        if(isset($data['is_invoice']))
+            $data['is_invoice'] = true;
+        else
+            $data['is_invoice'] = false;
+
+        if(isset($data['is_required']))
+            $data['is_required'] = true;
+        else
+            $data['is_required'] = false;
+
+        if(isset($data['is_admin']))
+            $data['is_admin'] = true;
+        else
+            $data['is_admin'] = false;
+
+        if(isset($data['is_disable']))
+            $data['is_disable'] = true;
+        else
+            $data['is_disable'] = false;
+        $lims_custom_field_data->update($data);
+        return redirect()->route('superAdmin.custom-fields')->with('message', 'Custom Field updated successfully');
+    }
+
+    public function destroy($id)
+    {
+        $custom_field_data = CustomField::find($id);
+        if($custom_field_data->belongs_to == 'sale')
+            $table_name = 'sales';
+        elseif($custom_field_data->belongs_to == 'product')
+            $table_name = 'products';
+        elseif($custom_field_data->belongs_to == 'purchase')
+            $table_name = 'purchases';
+        elseif($custom_field_data->belongs_to == 'customer')
+            $table_name = 'customers';
+        $column_name = str_replace(" ", "_", strtolower($custom_field_data->name));
+        $sqlStatement = "ALTER TABLE ". $table_name . " DROP COLUMN " . $column_name;
+        DB::insert($sqlStatement);
+        $custom_field_data->delete();
+        return redirect()->back()->with('not_permitted', 'Custom Field deleted successfully!');
     }
 }

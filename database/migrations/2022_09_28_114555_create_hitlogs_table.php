@@ -19,10 +19,22 @@ class CreateHitlogsTable extends Migration
             $table->string('view')->nullable();
             $table->string('browser')->nullable();
             $table->string('link')->nullable();
+
+            $table->string('mobile_number')->nullable();
+            $table->string('device')->nullable();
+            $table->string('width')->nullable();
+            $table->string('height')->nullable();
+            $table->string('model')->nullable();
+            $table->string('device_os')->nullable();
+            $table->string('brand')->nullable();
             $table->string('spent_time')->nullable();
             $table->timestamps();
         });
     }
+
+
+
+
 
     /**
      * Reverse the migrations.

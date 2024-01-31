@@ -98,9 +98,11 @@ class Productcrud
                     if (!isset($row->product_image)) {
                         return '<img src="' . asset('img\profile\blank-img.jpg' . $row->product_image) .
                             '" alt="' . $row->product_name . '" style="height: 40px;" >';
+                    }else{
+
+                        return '<img src="' . asset('thumbnail/' . $row->product_image) .
+                            '" alt="' . $row->product_name . '" style="height: 40px;" >';
                     }
-                    return '<img src="' . asset('thumbnail/' . $row->product_image) .
-                        '" alt="' . $row->product_name . '" style="height: 40px;" >';
                 })
                 ->addColumn('status', function ($row) {
                     if (!empty($row->is_active)) {
@@ -201,6 +203,11 @@ class Productcrud
 
     }
 
+    public function productssellUnitId($id)
+    {
+        $unit = Unit::where("id", $id)->get(["unit_code", "id"]);
+        return json_encode($unit);
+    }
     public function productspurchaseUnitId($id)
     {
         $unit = Unit::where("id", $id)->get(["unit_code", "id"]);
@@ -386,7 +393,7 @@ class Productcrud
     }
 
     // ==========================================
-    public function productData(Request $request)
+    public function productData( $request)
     {
         $columns = array(
             2 => 'product_name',
@@ -613,7 +620,7 @@ class Productcrud
 
     }
 
-    public function productsstore(Request $request)
+    public function productsstore($request)
     {
         // $this->validate($request, [
         //     'code' => [
@@ -631,6 +638,7 @@ class Productcrud
         // ]);
         $data = $request->except('product_name');
 
+
         if(isset($data['is_variant'])) {
             $data['variant_option'] = json_encode($data['variant_option']);
             $data['variant_value'] = json_encode($data['variant_value']);
@@ -647,7 +655,7 @@ class Productcrud
             $data['variant_list'] = implode(",", $data['variant_id']);
             $data['qty_list'] = implode(",", $data['product_qty']);
             $data['price_list'] = implode(",", $data['unit_price']);
-            $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
+            $data['product_cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
         }
         elseif($data['product_type'] == 'digital' || $data['product_type'] == 'service')
             $data['product_cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
@@ -659,46 +667,49 @@ class Productcrud
         if($data['last_date'])
             $data['last_date'] = date('Y-m-d', strtotime($data['last_date']));
         $data['is_active'] = true;
-        $images = $request->image;
-        $image_names = [];
-        if($images) {
-            if ( !file_exists("public/images/product/large") && !is_dir("public/images/product/large") ) {
-                mkdir("public/images/product/large");
-            }
-            if ( !file_exists("public/images/product/medium") && !is_dir("public/images/product/medium") ) {
-                mkdir("public/images/product/medium");
-            }
-            if ( !file_exists("public/images/product/small") && !is_dir("public/images/product/small") ) {
-                mkdir("public/images/product/small");
-            }
-            foreach ($images as $key => $image) {
-                $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
-                $imageName = date("Ymdhis") . ($key+1);
-                if(!config('database.connections.saleprosaas_landlord')) {
-                    $imageName = $imageName . '.' . $ext;
-                    $image->move('public/images/product', $imageName);
+        $images = $request->image_name;
 
-                    $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                    $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                    $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+        // dd($images);
+        $data['product_image'] = $images;
+        // $image_names = [];
+        // if($images) {
+        //     if ( !file_exists("public/images/product/large") && !is_dir("public/images/product/large") ) {
+        //         mkdir("public/images/product/large");
+        //     }
+        //     if ( !file_exists("public/images/product/medium") && !is_dir("public/images/product/medium") ) {
+        //         mkdir("public/images/product/medium");
+        //     }
+        //     if ( !file_exists("public/images/product/small") && !is_dir("public/images/product/small") ) {
+        //         mkdir("public/images/product/small");
+        //     }
+        //     foreach ($images as $key => $image) {
+        //         $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+        //         $imageName = date("Ymdhis") . ($key+1);
+        //         if(!config('database.connections.saleprosaas_landlord')) {
+        //             $imageName = $imageName . '.' . $ext;
+        //             $image->move('public/images/product', $imageName);
 
-                }
-                else {
-                    $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
-                    $image->move('public/images/product', $imageName);
+        //             $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
+        //             $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
+        //             $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
 
-                    $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                    $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                    $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+        //         }
+        //         else {
+        //             $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
+        //             $image->move('public/images/product', $imageName);
 
-                }
-                $image_names[] = $imageName;
-            }
-            $data['product_image'] = implode(",", $image_names);
-        }
-        else {
-            $data['product_image'] = 'zummXD2dvAtI.png';
-        }
+        //             $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
+        //             $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
+        //             $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+
+        //         }
+        //         $image_names[] = $imageName;
+        //     }
+        //     $data['product_image'] = implode(",", $image_names);
+        // }
+        // else {
+        //     $data['product_image'] = 'zummXD2dvAtI.png';
+        // }
         // $file = $request->file;
         // if ($file) {
         //     $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
@@ -893,7 +904,7 @@ class Productcrud
         ]);
     }
 
-    public function history(Request $request)
+    public function history( $request)
     {
         $role = Role::find(Auth::user()->role_id);
         if($role->hasPermissionTo('product_history')) {
@@ -919,7 +930,7 @@ class Productcrud
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
-    public function saleHistoryData(Request $request)
+    public function saleHistoryData( $request)
     {
         $columns = array(
             1 => 'created_at',
@@ -1009,7 +1020,7 @@ class Productcrud
         echo json_encode($json_data);
     }
 
-    public function purchaseHistoryData(Request $request)
+    public function purchaseHistoryData( $request)
     {
         $columns = array(
             1 => 'created_at',
@@ -1102,7 +1113,7 @@ class Productcrud
         echo json_encode($json_data);
     }
 
-    public function saleReturnHistoryData(Request $request)
+    public function saleReturnHistoryData( $request)
     {
         $columns = array(
             1 => 'created_at',
@@ -1194,7 +1205,7 @@ class Productcrud
         echo json_encode($json_data);
     }
 
-    public function purchaseReturnHistoryData(Request $request)
+    public function purchaseReturnHistoryData( $request)
     {
         $columns = array(
             1 => 'created_at',
@@ -1335,10 +1346,14 @@ class Productcrud
 
     }
 
-    public function productsupdate(Request $request)
+    public function productsupdate( $request)
     {
-            $lims_product_data = Product::findOrFail($request->input('id'));
-            $data = $request->except('product_image', 'file', 'prev_img');
+
+
+
+        $lims_product_data = Product::findOrFail($request->input('id'));
+        $data = $request->except('image_name', 'file', 'prev_img');
+        // dd($data);
 
 
             $data['product_name'] = htmlspecialchars(trim($data['name']));
@@ -1380,68 +1395,47 @@ class Productcrud
             if($data['last_date'])
                 $data['last_date'] = date('Y-m-d', strtotime($data['last_date']));
 
-            $previous_images = [];
-            //dealing with previous images
-            if($request->prev_img) {
-                foreach ($request->prev_img as $key => $prev_img) {
-                    if(!in_array($prev_img, $previous_images))
-                        $previous_images[] = $prev_img;
-                }
-                $lims_product_data->product_image = implode(",", $previous_images);
-                $lims_product_data->save();
-            }
-            else {
-                $lims_product_data->product_image = null;
-                $lims_product_data->save();
-            }
+
+                $images = $request->image_name;
+
+                // dd($images);
+                $data['product_image'] = $images;
+
+
+                // $previous_images = [];
+            // //dealing with previous images
+            // if($request->image_name) {
+            //     foreach ($request->prev_img as $key => $prev_img) {
+            //         if(!in_array($prev_img, $previous_images))
+            //             $previous_images[] = $prev_img;
+            //     }
+            //     $lims_product_data->product_image = implode(",", $previous_images);
+            //     $lims_product_data->save();
+            // }
+            // else {
+            //     $lims_product_data->product_image = null;
+            //     $lims_product_data->save();
+            // }
 
             //dealing with new images
-            if($request->product_image) {
-                if ( !file_exists("public/images/product/large") && !is_dir("public/images/product/large") ) {
-                    mkdir("public/images/product/large");
-                }
-                if ( !file_exists("public/images/product/medium") && !is_dir("public/images/product/medium") ) {
-                    mkdir("public/images/product/medium");
-                }
-                if ( !file_exists("public/images/product/small") && !is_dir("public/images/product/small") ) {
-                    mkdir("public/images/product/small");
-                }
-                $images = $request->product_image;
+            if($request->image_name) {
+
+                $images = $request->image_name;
                 $image_names = [];
                 $length = count(explode(",", $lims_product_data->product_image));
-                foreach ($images as $key => $image) {
-                    $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
-                    if(!config('database.connections.saleprosaas_landlord')) {
-                        $imageName = date("Ymdhis") . ($length + $key+1) . '.' . $ext;
-                        $image->move('public/images/product', $imageName);
-                        $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                        $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                        $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
-                    }else{
-                        $imageName = $this->getTenantId() . '_' . date("Ymdhis") . ($length + $key+1) . '.' . $ext;
-                        $image->move('public/images/product', $imageName);
-                        $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                        $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                        $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
-                    }
-                    $image_names[] = $imageName;
-                }
-                if($lims_product_data->image)
-                    $data['image'] = $lims_product_data->product_image. ',' . implode(",", $image_names);
-                else
-                    $data['image'] = implode(",", $image_names);
+
             }
             else
-                $data['image'] = $lims_product_data->product_image;
+                $data['product_image'] = $lims_product_data->product_image;
 
-            $file = $request->file;
-            if ($file) {
-                $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-                $fileName = strtotime(date('Y-m-d H:i:s'));
-                $fileName = $fileName . '.' . $ext;
-                $file->move('public/product/files', $fileName);
-                $data['file'] = $fileName;
-            }
+            // $file = $request->file;
+            // if ($file) {
+            //     $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+            //     $fileName = strtotime(date('Y-m-d H:i:s'));
+            //     $fileName = $fileName . '.' . $ext;
+            //     $file->move('public/product/files', $fileName);
+            //     $data['file'] = $fileName;
+            // }
 
             $old_product_variant_ids = ProductVariant::where('product_id', $request->input('id'))->pluck('id')->toArray();
             $new_product_variant_ids = [];
@@ -1551,11 +1545,7 @@ class Productcrud
         return $product;
     }
 
-    public function productssellUnitId($id)
-    {
-        $unit = Unit::where("base_unit", $id)->orWhere('id', $id)->pluck('unit_code','id');
-        return json_encode($unit);
-    }
+
 
     public function getData($id, $variant_id)
     {
@@ -1721,7 +1711,7 @@ class Productcrud
         return $data;
     }
 
-    public function importProduct(Request $request)
+    public function importProduct( $request)
     {
         //get file
         $upload=$request->file('file');
@@ -1855,7 +1845,7 @@ class Productcrud
          return redirect('products')->with('import_message', 'Product imported successfully');
     }
 
-    public function deleteBySelection(Request $request)
+    public function deleteBySelection( $request)
     {
         $product_id = $request['productIdArray'];
         foreach ($product_id as $id) {

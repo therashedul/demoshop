@@ -20,6 +20,7 @@ use \Symfony\Component\HttpFoundation\Session\Session;
 use Stripe\Stripe;
 use App\Models\{
     Supplier,
+    CustomField,
     Unit,
     Tax,
     Warehouse,
@@ -71,18 +72,18 @@ class Purchasecrud
                 //         $instance->collection = $instance->collection->filter(function ($row) use ($request) {
                 //             return Str::contains($row['reference_no'], $request->get('purchase_name')) ? true : false;
                 //         });
-                //     } 
+                //     }
                 //     if (!empty($request->get('search'))) {
                 //         $instance->collection = $instance->collection->filter(function ($row) use ($request) {
                 //             if (Str::contains(Str::lower($row['reference_no' ]), Str::lower($request->get('search')))){
                 //                 return true;
                 //             }else if (Str::contains(Str::lower($row['reference_no' ]), Str::lower($request->get('search')))) {
                 //                 return true;
-                //             }   
+                //             }
                 //             return false;
                 //         });
                 //     }
-                // })     
+                // })
 
                 ->addColumn('image', function ($row) {
                     if (!isset($row->image)) {
@@ -182,7 +183,7 @@ class Purchasecrud
                         $purchase_status = '<strong>' . trans('Ordered') . '</strong>';
                     }
                     // Update Button
-                    $viewButton = '<a href="javascript:void(0)" style="box-shadow:none;" class="btn btn-link view" 
+                    $viewButton = '<a href="javascript:void(0)" style="box-shadow:none;" class="btn btn-link view"
                                         data-id = "' . $row->id . '"
                                         data-date = "' . date('d-m-Y', strtotime($row->created_at)) . '"
                                         data-reference_no = "' . $row->reference_no . '"
@@ -227,13 +228,13 @@ class Purchasecrud
                                             </button>
                                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default menuScrolling" user="menu">
                                                 <li>' . $updateButton . '</li>
-                                            
-                                                <li>' . $viewpayment . '</li> 
-                                            
+
+                                                <li>' . $viewpayment . '</li>
+
                                                 <li>' . $viewButton . '</li>
-                                        
-                                                <li>' . $addpayment . '</li> 
-                                            
+
+                                                <li>' . $addpayment . '</li>
+
                                                 <li>' . $deleteButton . '</li>
                                             </ul>
                                         </div>';
@@ -290,17 +291,56 @@ class Purchasecrud
 
     public function purchasestore($request)
     {
-        $data = $request->except('name');
-        $data['reference_no'] = 'pr-' . date("Ymd") . '-' . date("his");
-        //    return dd($data);
-        if (isset($data['created_at'])) {
-            $data['created_at'] = date("Y-m-d H:i:s", strtotime($data['created_at']));
-        } else {
-            $data['created_at'] = date("Y-m-d H:i:s");
-        }
-        // $data['expired_date'] = date("Y-m-d", strtotime($data['expired_date']));
 
+        $data = $request->except('name');
+        // return dd($data);
+        $data['user_id'] = Auth::id();
+        $data['reference_no'] = 'pr-' . date("Ymd") . '-'. date("his");
+        // $document = $request->document;
+        // if ($document) {
+        //     $v = Validator::make(
+        //         [
+        //             'extension' => strtolower($request->document->getClientOriginalExtension()),
+        //         ],
+        //         [
+        //             'extension' => 'in:jpg,jpeg,png,gif,pdf,csv,docx,xlsx,txt',
+        //         ]
+        //     );
+        //     if ($v->fails())
+        //         return redirect()->back()->withErrors($v->errors());
+
+        //     $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
+        //     $documentName = date("Ymdhis");
+        //     if(!config('database.connections.saleprosaas_landlord')) {
+        //         $documentName = $documentName . '.' . $ext;
+        //         $document->move('public/documents/purchase', $documentName);
+        //     }
+        //     else {
+        //         $documentName = $this->getTenantId() . '_' . $documentName . '.' . $ext;
+        //         $document->move('public/documents/purchase', $documentName);
+        //     }
+        //     $data['document'] = $documentName;
+        // }
+        if(isset($data['created_at']))
+            $data['created_at'] = date("Y-m-d H:i:s", strtotime($data['created_at']));
+        else
+            $data['created_at'] = date("Y-m-d H:i:s");
         $lims_purchase_data = Purchase::create($data);
+        // return dd($lims_purchase_data);
+        //inserting data for custom fields
+        $custom_field_data = [];
+        $custom_fields = CustomField::where('belongs_to', 'purchase')->select('name', 'type')->get();
+        foreach ($custom_fields as $type => $custom_field) {
+            $field_name = str_replace(' ', '_', strtolower($custom_field->name));
+            if(isset($data[$field_name])) {
+                if($custom_field->type == 'checkbox' || $custom_field->type == 'multi_select')
+                    $custom_field_data[$field_name] = implode(",", $data[$field_name]);
+                else
+                    $custom_field_data[$field_name] = $data[$field_name];
+            }
+        }
+        if(count($custom_field_data))
+            DB::table('purchases')->where('id', $lims_purchase_data->id)->update($custom_field_data);
         $product_id = $data['product_id'];
         $product_code = $data['product_code'];
         $qty = $data['qty'];
@@ -315,9 +355,9 @@ class Purchasecrud
         $total = $data['subtotal'];
         $imei_numbers = $data['imei_number'];
         $product_purchase = [];
-        // return dd($data['expired_date']);
+
         foreach ($product_id as $i => $id) {
-            $lims_purchase_unit_data = Unit::where('unit_code', $purchase_unit[$i])->first();
+            $lims_purchase_unit_data  = Unit::where('unit_code', $purchase_unit[$i])->first();
 
             if ($lims_purchase_unit_data->operator == '*') {
                 $quantity = $recieved[$i] * $lims_purchase_unit_data->operation_value;
@@ -325,31 +365,33 @@ class Purchasecrud
                 $quantity = $recieved[$i] / $lims_purchase_unit_data->operation_value;
             }
             $lims_product_data = Product::find($id);
-
+            $price = $lims_product_data->product_price;
             //dealing with product barch
-            if ($batch_no[$i]) {
+            if($batch_no[$i]) {
                 $product_batch_data = ProductBatch::where([
-                    ['product_id', $lims_product_data->id],
-                    ['batch_no', $batch_no[$i]]
-                ])->first();
-                if ($product_batch_data) {
+                                        ['product_id', $lims_product_data->id],
+                                        ['batch_no', $batch_no[$i]]
+                                    ])->first();
+                if($product_batch_data) {
                     $product_batch_data->expired_date = $expired_date[$i];
                     $product_batch_data->qty += $quantity;
                     $product_batch_data->save();
-                } else {
+                }
+                else {
                     $product_batch_data = ProductBatch::create([
-                        'product_id' => $lims_product_data->id,
-                        'batch_no' => $batch_no[$i],
-                        'expired_date' => $expired_date[$i],
-                        'qty' => $quantity
-                    ]);
+                                            'product_id' => $lims_product_data->id,
+                                            'batch_no' => $batch_no[$i],
+                                            'expired_date' => $expired_date[$i],
+                                            'qty' => $quantity
+                                        ]);
                 }
                 $product_purchase['product_batch_id'] = $product_batch_data->id;
-            } else
+            }
+            else
                 $product_purchase['product_batch_id'] = null;
 
-            if ($lims_product_data->is_variant) {
-                $lims_product_variant_data = ProductVariant::select('*')->FindExactProductWithCode($lims_product_data->id, $product_code[$i])->first();
+            if($lims_product_data->is_variant) {
+                $lims_product_variant_data = ProductVariant::select('id', 'variant_id', 'qty')->FindExactProductWithCode($lims_product_data->id, $product_code[$i])->first();
                 $lims_product_warehouse_data = ProductWarehouse::where([
                     ['product_id', $id],
                     ['variant_id', $lims_product_variant_data->variant_id],
@@ -359,18 +401,32 @@ class Purchasecrud
                 //add quantity to product variant table
                 $lims_product_variant_data->qty += $quantity;
                 $lims_product_variant_data->save();
-            } else {
+            }
+            else {
                 $product_purchase['variant_id'] = null;
-                if ($product_purchase['product_batch_id']) {
+                if($product_purchase['product_batch_id']) {
+                    //checking for price
+                    $lims_product_warehouse_data = ProductWarehouse::where([
+                                                    ['product_id', $id],
+                                                    ['warehouse_id', $data['warehouse_id'] ],
+                                                ])
+                                                ->whereNotNull('price')
+                                                ->select('price')
+                                                ->first();
+                    if($lims_product_warehouse_data)
+                        $price = $lims_product_warehouse_data->price;
+                    else
+                        $price = null;
                     $lims_product_warehouse_data = ProductWarehouse::where([
                         ['product_id', $id],
-                        ['product_batch_id', $product_purchase['product_batch_id']],
-                        ['warehouse_id', $data['warehouse_id']],
+                        ['product_batch_id', $product_purchase['product_batch_id'] ],
+                        ['warehouse_id', $data['warehouse_id'] ],
                     ])->first();
-                } else {
+                }
+                else {
                     $lims_product_warehouse_data = ProductWarehouse::where([
                         ['product_id', $id],
-                        ['warehouse_id', $data['warehouse_id']],
+                        ['warehouse_id', $data['warehouse_id'] ],
                     ])->first();
                 }
             }
@@ -381,25 +437,28 @@ class Purchasecrud
             if ($lims_product_warehouse_data) {
                 $lims_product_warehouse_data->qty = $lims_product_warehouse_data->qty + $quantity;
                 $lims_product_warehouse_data->product_batch_id = $product_purchase['product_batch_id'];
-            } else {
+            }
+            else {
                 $lims_product_warehouse_data = new ProductWarehouse();
                 $lims_product_warehouse_data->product_id = $id;
                 $lims_product_warehouse_data->product_batch_id = $product_purchase['product_batch_id'];
                 $lims_product_warehouse_data->warehouse_id = $data['warehouse_id'];
                 $lims_product_warehouse_data->qty = $quantity;
-                if ($lims_product_data->is_variant)
+                if($price)
+                    $lims_product_warehouse_data->price = $price;
+                if($lims_product_data->is_variant)
                     $lims_product_warehouse_data->variant_id = $lims_product_variant_data->variant_id;
             }
             //added imei numbers to product_warehouse table
-            // if($imei_numbers[$i]) {
-            //     if($lims_product_warehouse_data->imei_number)
-            //         $lims_product_warehouse_data->imei_number .= ',' . $imei_numbers[$i];
-            //     else
-            //         $lims_product_warehouse_data->imei_number = $imei_numbers[$i];
-            // }
+            if($imei_numbers[$i]) {
+                if($lims_product_warehouse_data->imei_number)
+                    $lims_product_warehouse_data->imei_number .= ',' . $imei_numbers[$i];
+                else
+                    $lims_product_warehouse_data->imei_number = $imei_numbers[$i];
+            }
             $lims_product_warehouse_data->save();
 
-            $product_purchase['purchase_id'] = $lims_purchase_data->id;
+            $product_purchase['purchase_id'] = $lims_purchase_data->id ;
             $product_purchase['product_id'] = $id;
             $product_purchase['imei_number'] = $imei_numbers[$i];
             $product_purchase['qty'] = $qty[$i];
@@ -412,8 +471,6 @@ class Purchasecrud
             $product_purchase['total'] = $total[$i];
             ProductPurchase::create($product_purchase);
         }
-        // $request->session()->flash( 'Purchase  save successfully');
-        // return redirect('superAdmin/purchase');
         return redirect('superAdmin/purchase')->with('message', 'Purchase created successfully');
     }
 
@@ -454,9 +511,6 @@ class Purchasecrud
 
         $lims_payment_data = Payment::latest()->first();
         $data['payment_id'] = $lims_payment_data->id;
-        // =================================
-
-        // =================================
 
         if ($paying_method == 'Credit Card') {
             $lims_pos_setting_data = PosSetting::latest()->first();
@@ -473,7 +527,6 @@ class Purchasecrud
 
             $data['charge_id'] = $charge->id;
             PaymentWithCreditCard::create($data);
-
 
         } elseif ($paying_method == 'Cheque') {
             PaymentWithCheque::create($data);
@@ -1129,7 +1182,7 @@ class Purchasecrud
 
     }
 
-    // ========================Return Purchase===================    
+    // ========================Return Purchase===================
     public function returnPurchaseIndex($request)
     {
         if ($request->ajax()) {
@@ -1271,7 +1324,7 @@ class Purchasecrud
                     }
                     // Update Button
                     $viewButton =
-                        '<a href="javascript:void(0)" style="box-shadow:none;" class="btn btn-link view" 
+                        '<a href="javascript:void(0)" style="box-shadow:none;" class="btn btn-link view"
                                 data-id = "' . $row->id . '"
                                 data-date = "' . date('d-m-Y', strtotime($row->created_at)) . '"
                                 data-reference_no = "' . $row->reference_no . '"
@@ -1295,10 +1348,10 @@ class Purchasecrud
 
                                 data-return_note = "' . $row->return_note . '"
                                 data-staff_note = "' . $row->staff_note . '"
-                           
+
                                 data-user_name = "' . $user->name . '"
                                 data-user_email = "' . $user->email . '"
-                    
+
                                 ><i class="fa fa-eye"></i> ' . trans('View') . '</a>';
 
                     $updateButton = '<a href="' . route('superAdmin.return-purchase.edit', $row->id) . '" class="btn btn-link"><i class="fas fa-edit"></i> ' . trans('Edit') . '</a>';
@@ -1314,22 +1367,22 @@ class Purchasecrud
                                     </button>
                                     <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                         <li>' . $updateButton . '</li>
-                                    
+
                                         <li>' . $viewButton . '</li>
-                                    
+
                                         <li>' . $deleteButton . '</li>
                                     </ul>
                                 </div>';
 
                     // return $nasted ;
-    
+
                     return $updateButton . " " . $deleteButton . "" . $viewButton;
                 })
                 ->escapeColumns([])
                 // ->rawColumns(['action','status'])
                 ->make(true);
         }
-        // dd("kk"); 
+        // dd("kk");
         if ($request->input('warehouse_id'))
             $warehouse_id = $request->input('warehouse_id');
         else

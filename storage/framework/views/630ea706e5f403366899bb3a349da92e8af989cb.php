@@ -8,7 +8,7 @@
 <?php endif; ?>
 <?php if(!empty($general_setting->theme)): ?>
       <?php
-      
+
         if($general_setting->theme == 'default.css'){
           $color = '#733686';
           $color_rgba = 'rgba(115, 54, 134, 0.8)';
@@ -25,9 +25,9 @@
             $color = '#34495e';
             $color_rgba = 'rgba(52, 73, 94, 0.8)';
         }
-      
+
       ?>
-   
+
       <div class="row">
         <div class="container-fluid">
           <div class="col-md-12">
@@ -118,12 +118,12 @@
                     <canvas id="transactionChart" data-color = "<?php echo e($color); ?>" data-color_rgba = "<?php echo e($color_rgba); ?>" data-revenue=<?php echo e($revenue); ?> data-purchase=<?php echo e($purchase); ?> data-expense=<?php echo e($expense); ?> data-label1="<?php echo e(trans('Purchase')); ?>" data-label2="<?php echo e(trans('revenue')); ?>" data-label3="<?php echo e(trans('Expense')); ?>" width="100" height="95"> </canvas>
                 </div>
               </div>
-            </div>        
+            </div>
           </div>
         </div>
 
         <div class="container-fluid">
-          <div class="row">      
+          <div class="row">
             <div class="col-md-12">
               <div class="card">
                 <div class="card-header d-flex align-items-center">

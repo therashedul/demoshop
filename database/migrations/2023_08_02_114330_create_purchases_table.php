@@ -31,12 +31,12 @@ class CreatePurchasesTable extends Migration
             $table->double('grand_total')->nullable();
             $table->double('due_amount')->nullable();
             $table->double('paid_amount')->nullable();
-            $table->integer('purchases_status')->nullable();
+            $table->integer('purchase_status')->nullable();
             $table->dateTime('expired_date')->nullable();
             $table->integer('payment_status');
             $table->string('document')->nullable();
             $table->text('note')->nullable();
-            
+
             $table->timestamps();
         });
     }

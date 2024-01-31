@@ -2313,7 +2313,7 @@
             $('#description_value').val(description);
             // ============================ another way value pass, using input name
             // $('input[name=alt]').val(alt);
-            // $('input[name=title]').val(title);            
+            // $('input[name=title]').val(title);
 
             var image = '<div class="post-select-image-container">' +
                 '<a id="btn_delete_post_main_image" onclick="imageRemove()" class="btn btn-danger btn-sm btn-delete-selected-file-image">' +

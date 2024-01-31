@@ -3,6 +3,7 @@
 namespace App\Http\Servicecruds;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Mail;
 
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\{
@@ -328,7 +329,7 @@ class GeneralSettingcrud
   }
   public function backup()
   {
-     
+
       // Database configuration
       $host = env('DB_HOST');
       $username = env('DB_USERNAME');

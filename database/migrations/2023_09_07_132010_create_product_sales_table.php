@@ -17,9 +17,10 @@ class CreateProductSalesTable extends Migration
             $table->id();
             $table->integer('sale_id');
             $table->integer('product_id');
-            $table->integer('product_batch_id');
-            $table->integer('variant_id');
-            $table->integer('imei_number');
+            $table->integer('product_batch_id')->nullable();
+            $table->integer('variant_id')->nullable();
+            $table->integer('imei_number')->nullable();
+            $table->integer('return_qty')->nullable();
             $table->double('qty');
             $table->integer('sale_unit_id');
             $table->double('net_unit_price');

@@ -767,10 +767,15 @@
                         </li>
                     </li>
                     <li class="nav-item"> <a class="nav-link" href="{{ route('superAdmin.ganeralsetting.backup') }}">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Database back up</p>
-                    </a>
-                </li>
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Database back up</p>
+                        </a>
+                    </li>
+                    <li class="nav-item"> <a class="nav-link" href="{{ route('superAdmin.custom-fields') }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>custom fields</p>
+                        </a>
+                    </li>
 
 
                         {{-- ============================= --}}
