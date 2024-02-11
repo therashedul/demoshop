@@ -23,6 +23,7 @@ use Illuminate\Support\Str;
 use Stripe\Stripe;
 use App\Models\{
     Category,
+    Comment,
     Brand,
     Unit,
     Tax,

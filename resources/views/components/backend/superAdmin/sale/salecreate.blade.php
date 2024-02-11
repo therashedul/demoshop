@@ -280,6 +280,58 @@
                                                             @endif
                                                         </div>
                                                     </div>
+                                                    {{-- =========== custom field========= --}}
+                                                    @foreach($customfields as $field)
+                                                    @if(!$field->is_admin || \Auth::user()->role_id == 1)
+                                                        <div class="{{'col-md-'.$field->grid_value}}">
+                                                            <div class="form-group">
+                                                                <label>{{$field->name}}</label>
+                                                                @if($field->type == 'text')
+                                                                    <input type="text" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif>
+                                                                @elseif($field->type == 'number')
+                                                                    <input type="number" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif>
+                                                                @elseif($field->type == 'textarea')
+                                                                    <textarea rows="5" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif></textarea>
+                                                                @elseif($field->type == 'checkbox')
+                                                                    <br>
+                                                                    <?php $option_values = explode(",", $field->option_value); ?>
+                                                                    @foreach($option_values as $value)
+                                                                        <label>
+                                                                            <input type="checkbox" name="{{str_replace(' ', '_', strtolower($field->name))}}[]" value="{{$value}}" @if($value == $field->default_value){{'checked'}}@endif @if($field->is_required){{'required'}}@endif> {{$value}}
+                                                                        </label>
+                                                                        &nbsp;
+                                                                    @endforeach
+                                                                @elseif($field->type == 'radio_button')
+                                                                    <br>
+                                                                    <?php $option_values = explode(",", $field->option_value); ?>
+                                                                    @foreach($option_values as $value)
+                                                                        <label class="radio-inline">
+                                                                            <input type="radio" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$value}}" @if($value == $field->default_value){{'checked'}}@endif @if($field->is_required){{'required'}}@endif> {{$value}}
+                                                                        </label>
+                                                                        &nbsp;
+                                                                    @endforeach
+                                                                @elseif($field->type == 'select')
+                                                                    <?php $option_values = explode(",", $field->option_value); ?>
+                                                                    <select class="form-control" name="{{str_replace(' ', '_', strtolower($field->name))}}" @if($field->is_required){{'required'}}@endif>
+                                                                        @foreach($option_values as $value)
+                                                                            <option value="{{$value}}" @if($value == $field->default_value){{'selected'}}@endif>{{$value}}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                @elseif($field->type == 'multi_select')
+                                                                    <?php $option_values = explode(",", $field->option_value); ?>
+                                                                    <select class="form-control" name="{{str_replace(' ', '_', strtolower($field->name))}}[]" @if($field->is_required){{'required'}}@endif multiple>
+                                                                        @foreach($option_values as $value)
+                                                                            <option value="{{$value}}" @if($value == $field->default_value){{'selected'}}@endif>{{$value}}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                @elseif($field->type == 'date_picker')
+                                                                    <input type="text" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control date" @if($field->is_required){{'required'}}@endif>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                                    {{-- ============ --}}
                                                     <div class="col-md-4">
                                                         <div class="form-group">
                                                             <label>{{ trans('Sale Status') }} *</label>
@@ -307,7 +359,90 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                {{-- ======= New payment system========= --}}
                                                 <div id="payment">
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>{{trans('file.Paid By')}}</label>
+                                                                <select name="paid_by_id" class="form-control">
+                                                                    @if(in_array("cash",$options))
+                                                                    <option value="1">Cash</option>
+                                                                    @endif
+                                                                    @if(in_array("gift_card",$options))
+                                                                    <option value="2">Gift Card</option>
+                                                                    @endif
+                                                                    @if(in_array("card",$options))
+                                                                    <option value="3">Credit Card</option>
+                                                                    @endif
+                                                                    @if(in_array("cheque",$options))
+                                                                    <option value="4">Cheque</option>
+                                                                    @endif
+                                                                    @if(in_array("paypal",$options) && (strlen($limspossettingdata->paypal_live_api_username)>0) && (strlen($limspossettingdata->paypal_live_api_password)>0) && (strlen($limspossettingdata->paypal_live_api_secret)>0))
+                                                                    <option value="5">Paypal</option>
+                                                                    @endif
+                                                                    @if(in_array("deposit",$options))
+                                                                    <option value="6">Deposit</option>
+                                                                    @endif
+                                                                    @if($limsrewardpointsettingdata && $limsrewardpointsettingdata->is_active)
+                                                                    <option value="7">Points</option>
+                                                                    @endif
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>{{trans('file.Recieved Amount')}} *</label>
+                                                                <input type="number" name="paying_amount" class="form-control" id="paying-amount" step="any" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>{{trans('file.Paying Amount')}} *</label>
+                                                                <input type="number" name="paid_amount" class="form-control" id="paid-amount" step="any"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label>{{trans('file.Change')}}</label>
+                                                                <p id="change" class="ml-2">{{number_format(0, 2, '.', '')}}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <div class="card-element" class="form-control">
+                                                                </div>
+                                                                <div class="card-errors" role="alert"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="gift-card">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label> {{trans('file.Gift Card')}} *</label>
+                                                                <select id="gift_card_id" name="gift_card_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Gift Card..."></select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="cheque">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label>{{trans('file.Cheque Number')}} *</label>
+                                                                <input type="text" name="cheque_no" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <label>{{trans('file.Payment Note')}}</label>
+                                                            <textarea rows="3" class="form-control" name="payment_note"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {{-- ===== Old payment section ====== --}}
+                                                {{-- <div id="payment">
                                                     <div class="row">
                                                         <div class="col-md-3">
                                                             <div class="form-group">
@@ -384,7 +519,8 @@
                                                             <textarea rows="3" class="form-control" name="payment_note"></textarea>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> --}}
+                                                {{-- ================= --}}
                                                 <div class="row mt-2">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
@@ -493,107 +629,91 @@
                         </div>
                     </div>
 
+  <!-- add customer modal -->
+  <div id="addCustomer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+    <div role="document" class="modal-dialog">
+      <div class="modal-content">
+        {!! Form::open(['route' => 'superAdmin.customer.store', 'method' => 'post', 'files' => true, 'id' => 'customer-form']) !!}
+        <div class="modal-header">
+          <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Customer')}}</h5>
+          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+        </div>
+        <div class="modal-body">
+          <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+            <div class="form-group">
+                <label>{{trans('file.Customer Group')}} *</strong> </label>
+                <select required class="form-control selectpicker" name="customer_group_id">
+                    @foreach($limscustomergroupall as $customer_group)
+                        <option value="{{$customer_group->id}}">{{$customer_group->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>{{trans('file.name')}} *</strong> </label>
+                <input type="text" name="customer_name" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label>{{trans('file.Email')}}</label>
+                <input type="text" name="email" placeholder="example@example.com" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>{{trans('file.Phone Number')}} *</label>
+                <input type="text" name="phone_number" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label>{{trans('file.Address')}} *</label>
+                <input type="text" name="address" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label>{{trans('file.City')}} *</label>
+                <input type="text" name="city" required class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="hidden" name="pos" value="1">
+                <button type="button" class="btn btn-primary customer-submit-btn">{{trans('file.submit')}}</button>
+            </div>
+        </div>
+        {{ Form::close() }}
+      </div>
+    </div>
+</div>
+<!-- add cash register modal -->
+<div id="cash-register-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+    <div role="document" class="modal-dialog">
+      <div class="modal-content">
+        {!! Form::open(['route' => 'superAdmin.cashRegister.store', 'method' => 'post']) !!}
+        <div class="modal-header">
+          <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Cash Register')}}</h5>
+          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+        </div>
+        <div class="modal-body">
+          <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+            <div class="row">
+              <div class="col-md-6 form-group warehouse-section">
+                  <label>{{trans('file.Warehouse')}} *</strong> </label>
+                  <select required name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                      @foreach($limswarehouselist as $warehouse)
+                      <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                      @endforeach
+                  </select>
+              </div>
+              <div class="col-md-6 form-group">
+                  <label>{{trans('file.Cash in Hand')}} *</strong> </label>
+                  <input type="number" step="any" name="cash_in_hand" required class="form-control">
+              </div>
+              <div class="col-md-12 form-group">
+                  <button type="submit" class="btn btn-primary">{{trans('file.submit')}}</button>
+              </div>
+            </div>
+        </div>
+        {{ Form::close() }}
+      </div>
+    </div>
+</div>
 
-                    <div id="cash-register-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                        aria-hidden="true" class="modal fade text-left">
-                        <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                {!! Form::open(['route' => 'superAdmin.sale.cashRegister', 'method' => 'post']) !!}
-                                <div class="modal-header">
-                                    <h5 id="exampleModalLabel" class="modal-title">
-                                        {{ trans('Add Cash Register') }}</h5>
-                                    <button type="button" data-dismiss="modal" aria-label="Close"
-                                        class="close"><span aria-hidden="true"><i
-                                                class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="italic">
-                                        <small>{{ trans('The field labels marked with * are required input fields') }}.</small>
-                                    </p>
-                                    <div class="row">
-                                        <div class="col-md-6 form-group warehouse-section">
-                                            <label>{{ trans('Warehouse') }} *</strong> </label>
-                                            <select required name="warehouse_id" class="form-control"
-                                                data-live-search="true" data-live-search-style="begins"
-                                                title="Select warehouse...">
-                                                @foreach ($limswarehouselist as $warehouse)
-                                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 form-group">
-                                            <label>{{ trans('Cash in Hand') }} *</strong> </label>
-                                            <input type="number" name="cash_in_hand" required class="form-control">
-                                        </div>
-                                        <div class="col-md-12 form-group">
-                                            <button type="submit"
-                                                class="btn btn-primary">{{ trans('submit') }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {{ Form::close() }}
-                            </div>
-                        </div>
-                    </div>
-                    <!-- add customer modal -->
-                    <div id="addCustomer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                        aria-hidden="true" class="modal fade text-left">
-                        <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <form method="POST" action="https://salepropos.com/demo/customer"
-                                    accept-charset="UTF-8" id="customer-form" enctype="multipart/form-data"><input
-                                        name="_token" type="hidden"
-                                        value="BQN3aQElsoD1gdxWJtMiVCFTV905Kh5SfnEzBaaU">
-                                    <div class="modal-header">
-                                        <h5 id="exampleModalLabel" class="modal-title">Add Customer</h5>
-                                        <button type="button" data-dismiss="modal" aria-label="Close"
-                                            class="close"><span aria-hidden="true"><i
-                                                    class="dripicons-cross"></i></span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p class="italic"><small>The field labels marked with * are required input
-                                                fields.</small></p>
-                                        <div class="form-group">
-                                            <label>Customer Group *</strong> </label>
-                                            <select required class="form-control selectpicker"
-                                                name="customer_group_id">
-                                                <option value="1">general</option>
-                                                <option value="2">distributor</option>
-                                                <option value="3">reseller</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Name *</strong> </label>
-                                            <input type="text" name="customer_name" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Email</label>
-                                            <input type="text" name="email" placeholder="example@example.com"
-                                                class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Phone Number *</label>
-                                            <input type="text" name="phone_number" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Address *</label>
-                                            <input type="text" name="address" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>City *</label>
-                                            <input type="text" name="city" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="hidden" name="pos" value="1">
-                                            <button type="button"
-                                                class="btn btn-primary customer-submit-btn">Submit</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+
+
+
                     {{-- ================= Modal============= --}}
 
                 </section>

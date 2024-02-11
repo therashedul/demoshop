@@ -306,7 +306,7 @@
                         <?php $__currentLoopData = $best_selling_qty; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$sale): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php $images = explode(",", $sale->product_images)?>
                         <tr>
-                          <td><img src="<?php echo e(url('public/images/product', $images[0])); ?>" height="25" width="30"> <?php echo e($sale->product_name); ?> [<?php echo e($sale->product_code); ?>]</td>
+                          <td><img src="<?php echo e(url('images', $images[0])); ?>" height="25" width="30"> <?php echo e($sale->product_name); ?> [<?php echo e($sale->product_code); ?>]</td>
                           <td><?php echo e($sale->sold_qty); ?></td>
                         </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -335,7 +335,7 @@
                         <?php $__currentLoopData = $yearly_best_selling_qty; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $sale): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php $images = explode(",", $sale->product_images)?>
                         <tr>
-                          <td><img src="<?php echo e(url('public/images/product', $images[0])); ?>" height="25" width="30"> <?php echo e($sale->product_name); ?> [<?php echo e($sale->product_code); ?>]</td>
+                          <td><img src="<?php echo e(url('images', $images[0])); ?>" height="25" width="30"> <?php echo e($sale->product_name); ?> [<?php echo e($sale->product_code); ?>]</td>
                           <td><?php echo e($sale->sold_qty); ?></td>
                         </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -364,7 +364,7 @@
                         <?php $__currentLoopData = $yearly_best_selling_price; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $sale): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php $images = explode(",", $sale->product_images)?>
                         <tr>
-                          <td><img src="<?php echo e(url('public/images/product', $images[0])); ?>" height="25" width="30"> <?php echo e($sale->product_name); ?> [<?php echo e($sale->product_code); ?>]</td>
+                          <td><img src="<?php echo e(url('images', $images[0])); ?>" height="25" width="30"> <?php echo e($sale->product_name); ?> [<?php echo e($sale->product_code); ?>]</td>
                           <td><?php echo e(number_format((float)$sale->total_price, 2, '.', '')); ?></td>
                         </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -380,51 +380,214 @@
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('custom_scripts'); ?>
 <script type="text/javascript">
-    // Show and hide color-switcher
-    $(".color-switcher .switcher-button").on('click', function() {
-        $(".color-switcher").toggleClass("show-color-switcher", "hide-color-switcher", 300);
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/yearly-best-selling-price")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          var url = '<?php echo e(url("/public/images/product")); ?>';
+          data.forEach(function(item){
+            if(item.product_images)
+              var images = item.product_images.split('|');
+            else
+              var images = ['zummXD2dvAtI.png'];
+            $('#yearly-best-selling-price').find('tbody').append('<tr><td><img src="'+url+'/public/images/'+images[0]+'" height="25" width="30"> '+item.product_name+' ['+item.product_code+']</td><td>'+item.total_price+'</td></tr>');
+          })
+      }
     });
+  });
 
-    // Color Skins
-    $('a.color').on('click', function() {
-        /*var title = $(this).attr('title');
-        $('#style-colors').attr('href', 'css/skin-' + title + '.css');
-        return false;*/
-        $.get('setting/general_setting/change-theme/' + $(this).data('color'), function(data) {
-        });
-        var style_link= $('#custom-style').attr('href').replace(/([^-]*)$/, $(this).data('color') );
-        $('#custom-style').attr('href', style_link);
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/yearly-best-selling-qty")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          var url = '<?php echo e(url("/public/images/product")); ?>';
+          data.forEach(function(item){
+            if(item.product_images)
+              var images = item.product_images.split('|');
+            else
+              var images = ['zummXD2dvAtI.png'];
+            $('#yearly-best-selling-qty').find('tbody').append('<tr><td><img src="'+url+'/public/images/'+images[0]+'" height="25" width="30"> '+item.product_name+' ['+item.product_code+']</td><td>'+item.sold_qty+'</td></tr>');
+          })
+      }
     });
+  });
 
-    $(".date-btn").on("click", function() {
-        $(".date-btn").removeClass("active");
-        $(this).addClass("active");
-        var start_date = $(this).data('start_date');
-        var end_date = $(this).data('end_date');
-        $.get('dashboard-filter/' + start_date + '/' + end_date, function(data) {
-            //console.log(data);
-            dashboardFilter(data);
-        });
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/monthly-best-selling-qty")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          var url = '<?php echo e(url("/public/images/product")); ?>';
+          data.forEach(function(item){
+            if(item.product_images)
+              var images = item.product_images.split('|');
+            else
+              var images = ['zummXD2dvAtI.png'];
+            $('#monthly-best-selling-qty').find('tbody').append('<tr><td><img src="'+url+'/public/images/'+images[0]+'" height="25" width="30"> '+item.product_name+' ['+item.product_code+']</td><td>'+item.sold_qty+'</td></tr>');
+          })
+      }
     });
+  });
 
-    function dashboardFilter(data){
-        $('.revenue-data').hide();
-        $('.revenue-data').html(parseFloat(data[0]).toFixed(2));
-        $('.revenue-data').show(500);
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/recent-sale")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          data.forEach(function(item){
+            var sale_date = dateFormat(item.created_at.split('T')[0], '<?php echo e($general_setting->date_format); ?>')
+            if(item.sale_status == 1){
+              var status = '<div class="badge badge-success"><?php echo e(trans("file.Completed")); ?></div>';
+            } else if(item.sale_status == 2) {
+              var status = '<div class="badge badge-danger"><?php echo e(trans("file.Pending")); ?></div>';
+            } else {
+              var status = '<div class="badge badge-warning"><?php echo e(trans("file.Draft")); ?></div>';
+            }
+            $('#recent-sale').find('tbody').append('<tr><td>'+sale_date+'</td><td>'+item.reference_no+'</td><td>'+item.name+'</td><td>'+status+'</td><td>'+item.grand_total+'</td></tr>');
+          })
+      }
+    });
+  });
 
-        $('.return-data').hide();
-        $('.return-data').html(parseFloat(data[1]).toFixed(2));
-        $('.return-data').show(500);
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/recent-purchase")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          data.forEach(function(item){
+            var payment_date = dateFormat(item.created_at.split('T')[0], '<?php echo e($general_setting->date_format); ?>')
+            if(item.payment_status == 1){
+              var status = '<div class="badge badge-success"><?php echo e(trans("file.Completed")); ?></div>';
+            } else if(item.payment_status == 2) {
+              var status = '<div class="badge badge-danger"><?php echo e(trans("file.Pending")); ?></div>';
+            } else {
+              var status = '<div class="badge badge-warning"><?php echo e(trans("file.Draft")); ?></div>';
+            }
+            $('#recent-purchase').find('tbody').append('<tr><td>'+payment_date+'</td><td>'+item.reference_no+'</td><td>'+item.name+'</td><td>'+status+'</td><td>'+item.grand_total+'</td></tr>');
+          })
+      }
+    });
+  });
 
-        $('.profit-data').hide();
-        $('.profit-data').html(parseFloat(data[2]).toFixed(2));
-        $('.profit-data').show(500);
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/recent-quotation")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          data.forEach(function(item){
+            var quotation_date = dateFormat(item.created_at.split('T')[0], '<?php echo e($general_setting->date_format); ?>')
+            if(item.quotation_status == 1){
+              var status = '<div class="badge badge-success"><?php echo e(trans("file.Completed")); ?></div>';
+            } else if(item.quotation_status == 2) {
+              var status = '<div class="badge badge-danger"><?php echo e(trans("file.Pending")); ?></div>';
+            } else {
+              var status = '<div class="badge badge-warning"><?php echo e(trans("file.Draft")); ?></div>';
+            }
+            $('#recent-quotation').find('tbody').append('<tr><td>'+quotation_date+'</td><td>'+item.reference_no+'</td><td>'+item.name+'</td><td>'+status+'</td><td>'+item.grand_total+'</td></tr>');
+          })
+      }
+    });
+  });
 
-        $('.purchase_return-data').hide();
-        $('.purchase_return-data').html(parseFloat(data[3]).toFixed(2));
-        $('.purchase_return-data').show(500);
-    }
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/recent-payment")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          data.forEach(function(item){
+            var payment_date = dateFormat(item.created_at.split('T')[0], '<?php echo e($general_setting->date_format); ?>')
+            $('#recent-payment').find('tbody').append('<tr><td>'+payment_date+'</td><td>'+item.payment_reference+'</td><td>'+item.amount+'</td><td>'+item.paying_method+'</td></tr>');
+          })
+      }
+    });
+  });
+
+  function dateFormat(inputDate, format) {
+      const date = new Date(inputDate);
+      //extract the parts of the date
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();    
+      //replace the month
+      format = format.replace("m", month.toString().padStart(2,"0"));        
+      //replace the year
+      format = format.replace("Y", year.toString());
+      //replace the day
+      format = format.replace("d", day.toString().padStart(2,"0"));
+      return format;
+  }
+  
+
+  $(document).ready(function(){
+    $.ajax({
+      url: '<?php echo e(url("/")); ?>',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          $('#userShowModal').modal('show');
+          $('#user-id').text(data.id);
+          $('#user-name').text(data.name);
+          $('#user-email').text(data.email);
+      }
+    });
+  })
+  // Show and hide color-switcher
+  $(".color-switcher .switcher-button").on('click', function() {
+      $(".color-switcher").toggleClass("show-color-switcher", "hide-color-switcher", 300);
+  });
+
+  // Color Skins
+  $('a.color').on('click', function() {
+
+    // alert("kk");
+    /*var title = $(this).attr('title');
+      $('#style-colors').attr('href', 'css/skin-' + title + '.css');
+      return false;*/
+      $.get('setting/general_setting/change-theme/' + $(this).data('color'), function(data) {
+      });
+      var style_link= $('#custom-style').attr('href').replace(/([^-]*)$/, $(this).data('color') );
+      $('#custom-style').attr('href', style_link);
+  });
+
+  $(".date-btn").on("click", function() {
+      $(".date-btn").removeClass("active");
+      $(this).addClass("active");
+      var start_date = $(this).data('start_date');
+      var end_date = $(this).data('end_date');
+      $.get('dashboard-filter/' + start_date + '/' + end_date, function(data) {
+          //console.log(data);
+          dashboardFilter(data);
+      });
+  });
+
+  function dashboardFilter(data){
+      $('.revenue-data').hide();
+      $('.revenue-data').html(parseFloat(data[0]).toFixed(<?php echo e(2); ?>));
+      $('.revenue-data').show(500);
+
+      $('.return-data').hide();
+      $('.return-data').html(parseFloat(data[1]).toFixed(<?php echo e(2); ?>));
+      $('.return-data').show(500);
+
+      $('.profit-data').hide();
+      $('.profit-data').html(parseFloat(data[2]).toFixed(<?php echo e(2); ?>));
+      $('.profit-data').show(500);
+
+      $('.purchase_return-data').hide();
+      $('.purchase_return-data').html(parseFloat(data[3]).toFixed(<?php echo e(2); ?>));
+      $('.purchase_return-data').show(500);
+  }
 </script>
+
 <?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.home', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH F:\xampp74\htdocs\demoshop\resources\views/index.blade.php ENDPATH**/ ?>

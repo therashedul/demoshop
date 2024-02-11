@@ -80,8 +80,6 @@ class Salecrud
     use \App\Traits\TenantInfo;
     use \App\Traits\MailInfo;
 
-
-
     public function saleindex($request)
     {
         $sales = Sale::latest()->get();
@@ -1524,8 +1522,8 @@ class Salecrud
                 foreach ($lims_product_variant_data as $key => $variant) {
                     $data['product_name'][$index] = $product->product_name.' ['.$variant->variant_name.']';
                     $data['product_code'][$index] = $variant->pivot['item_code'];
-                    $images = explode(",", $product->image);
-                    $data['image'][$index] = $images[0];
+                    $images = explode(",", $product->product_image);
+                    $data['product_image'][$index] = $images[0];
                     $index++;
                 }
             }
@@ -2214,7 +2212,7 @@ class Salecrud
 
     }
 
-    public function saleupdate(Request $request, $id)
+    public function saleupdate($request, $id)
     {
         $data = $request->except('document');
 

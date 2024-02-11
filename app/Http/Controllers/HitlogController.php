@@ -93,20 +93,20 @@ class HitlogController extends Controller
 
     function get_msisdn() {
 
-        $msisdn = "";
+        // $msisdn = "";
 
-        if (request()->hasHeader('HTTP_X_UP_CALLING_LINE_ID')) {
-            $msisdn = trim(request()->header('HTTP_X_UP_CALLING_LINE_ID'));
-        } elseif (request()->hasHeader('HTTP_X_HTS_CLID')) {
-            $msisdn = trim(request()->header('HTTP_X_HTS_CLID'));
-        } elseif (request()->hasHeader('HTTP_MSISDN')) {
-            $msisdn = trim(request()->header('HTTP_MSISDN'));
-        } elseif (request()->hasCookie('User-Identity-Forward-msisdn')) {
-            $msisdn = request()->cookie('User-Identity-Forward-msisdn');
-        } elseif (request()->hasHeader('HTTP_X_MSISDN')) {
-            $msisdn = request()->header('HTTP_X_MSISDN');
-        }
-        return $msisdn;
+        // if (request()->hasHeader('HTTP_X_UP_CALLING_LINE_ID')) {
+        //     $msisdn = trim(request()->header('HTTP_X_UP_CALLING_LINE_ID'));
+        // } elseif (request()->hasHeader('HTTP_X_HTS_CLID')) {
+        //     $msisdn = trim(request()->header('HTTP_X_HTS_CLID'));
+        // } elseif (request()->hasHeader('HTTP_MSISDN')) {
+        //     $msisdn = trim(request()->header('HTTP_MSISDN'));
+        // } elseif (request()->hasCookie('User-Identity-Forward-msisdn')) {
+        //     $msisdn = request()->cookie('User-Identity-Forward-msisdn');
+        // } elseif (request()->hasHeader('HTTP_X_MSISDN')) {
+        //     $msisdn = request()->header('HTTP_X_MSISDN');
+        // }
+        // return $msisdn;
 
         // $msisdn = "";
         // if (isset($_SERVER['HTTP_X_UP_CALLING_LINE_ID'])) {
@@ -125,20 +125,20 @@ class HitlogController extends Controller
         // return $msisdn;
 // ----------------------------------------
 
-		// $msisdn = "";
-		// if (isset($_SERVER['HTTP_X_UP_CALLING_LINE_ID'])) {
-        //     $msisdn = trim($_SERVER['HTTP_X_UP_CALLING_LINE_ID']);
-        // } else if (isset($_SERVER['HTTP_X_HTS_CLID'])) {
-        //     $msisdn = trim($_SERVER['HTTP_X_HTS_CLID']);
-        // } else if (isset($_SERVER['HTTP_MSISDN'])) {
-        //     $msisdn = trim($_SERVER['HTTP_MSISDN']);
-        // } else if (isset($_COOKIE['User-Identity-Forward-msisdn'])) {
-        //     $msisdn = $_COOKIE['User-Identity-Forward-msisdn'];
-        // } else if (isset($_SERVER["HTTP_X_MSISDN"])) {
-        //     $msisdn = $_SERVER["HTTP_X_MSISDN"];
-        // }
+		$msisdn = "";
+		if (isset($_SERVER['HTTP_X_UP_CALLING_LINE_ID'])) {
+            $msisdn = trim($_SERVER['HTTP_X_UP_CALLING_LINE_ID']);
+        } else if (isset($_SERVER['HTTP_X_HTS_CLID'])) {
+            $msisdn = trim($_SERVER['HTTP_X_HTS_CLID']);
+        } else if (isset($_SERVER['HTTP_MSISDN'])) {
+            $msisdn = trim($_SERVER['HTTP_MSISDN']);
+        } else if (isset($_COOKIE['User-Identity-Forward-msisdn'])) {
+            $msisdn = $_COOKIE['User-Identity-Forward-msisdn'];
+        } else if (isset($_SERVER["HTTP_X_MSISDN"])) {
+            $msisdn = $_SERVER["HTTP_X_MSISDN"];
+        }
         // header("Refresh:1;");
-        // return $msisdn;
+        return $msisdn;
     }
     /**
      * Display a listing of the resource.
@@ -257,7 +257,6 @@ class HitlogController extends Controller
             $platform .= "Desktop";
         }
         // -------------------------------
-
         $browser  = $this->device_browser($browser = TRUE);
         $Ip       = $this->getIp();
         $mobile       = $this->get_msisdn();

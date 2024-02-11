@@ -95,7 +95,7 @@
                                         @endif
                                     </div>
                                 </div> --}}
-                                <div class="col-md-6 d-none">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>{{trans('Theme')}} *</label>
                                         <div class="row ml-1">
@@ -235,7 +235,7 @@
         // $('.selectpicker').selectpicker('refresh');
     }
 
-    $('.theme-option').on('click', function() {
+    $('.theme-option').on('click', function() {  
         $.get('general_setting/change-theme/' + $(this).data('color'), function(data) {
         });
         var style_link= $('#custom-style').attr('href').replace(/([^-]*)$/, $(this).data('color') );

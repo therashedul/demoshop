@@ -149,7 +149,7 @@
                                     <input class="form-control" type="number" name="decimal" value="<?php if($lims_general_setting_data): ?><?php echo e($lims_general_setting_data->decimal); ?><?php endif; ?>" max="6" min="0">
                                 </div>
                             </div>
-                            <div class="col-md-4 d-none">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label><?php echo e(trans('Theme')); ?> *</label>
                                     <div class="row ml-1">

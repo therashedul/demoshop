@@ -49,3 +49,13 @@ Route::post('/process-device-size', [App\Http\Controllers\HitlogController::clas
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/dashboard-filter/{start_date}/{end_date}', [App\Http\Controllers\HomeController::class, 'dashboardFilter']);
+Route::get('/yearly-best-selling-price', [App\Http\Controllers\HomeController::class, 'yearlyBestSellingPrice']);
+    Route::get('/yearly-best-selling-qty', [App\Http\Controllers\HomeController::class, 'yearlyBestSellingQty']);
+    Route::get('/monthly-best-selling-qty', [App\Http\Controllers\HomeController::class, 'monthlyBestSellingQty']);
+    Route::get('/recent-sale', [App\Http\Controllers\HomeController::class, 'recentSale']);
+    Route::get('/recent-purchase', [App\Http\Controllers\HomeController::class, 'recentPurchase']);
+    Route::get('/recent-payment', [App\Http\Controllers\HomeController::class, 'recentPayment']);
+    Route::get('/recent-quotation', [App\Http\Controllers\HomeController::class, 'recentQuotation']);
+    Route::get('switch-theme/{theme}', [App\Http\Controllers\HomeController::class, 'switchTheme'])->name('switchTheme');
+    Route::get('my-transactions/{year}/{month}', [App\Http\Controllers\HomeController::class, 'myTransaction']);
+    Route::get('addon-list', [App\Http\Controllers\HomeController::class, 'addonList']);

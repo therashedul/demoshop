@@ -337,8 +337,6 @@
         }
     </style>
 </head>
-
-
 <body class="hold-transition sidebar-mini layout-fixed" onbeforeunload="MyFunction();">
     <div class="wrapper">
         <!-- Preloader -->
@@ -2391,7 +2389,6 @@
         });
     </script>
     {{-- ===================End image upload========== --}}
-
 
 </body>
 </html>

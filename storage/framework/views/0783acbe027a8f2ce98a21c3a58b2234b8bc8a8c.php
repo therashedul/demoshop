@@ -51,7 +51,7 @@
 <div class="container px-4 ">
     <div class="row justify-content-center align-items-center g-2">
         <a class="btn btn-primary float-right pull-right" href="<?php echo e(route('superAdmin.products.create')); ?>"
-            id="createNewPost"> Add New Post</a> &NonBreakingSpace; &nbsp;
+            id="createNewPost"> Add New Product</a> &NonBreakingSpace; &nbsp;
         <button type="button" class="btn btn-info searchBtn"><i class="fas fa-search-plus"></i> Search</button>
     </div>
     <script type="text/javascript">

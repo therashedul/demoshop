@@ -32,43 +32,6 @@ use \Symfony\Component\HttpFoundation\Session\Session;
 
 use Stripe\Stripe;
 
-// use App\Http\Servicecruds\Mediacrud;
-// use App\Http\Servicecruds\Settingcrud;
-// use App\Http\Servicecruds\Accountcrud;
-// use App\Http\Servicecruds\MoneyTransfercrud;
-// use App\Http\Servicecruds\CashRegistercrud;
-// use App\Http\Servicecruds\Categorycrud;
-// use App\Http\Servicecruds\Brandcrud;
-// use App\Http\Servicecruds\Unitcrud;
-// use App\Http\Servicecruds\Taxcrud;
-// use App\Http\Servicecruds\Couriercrud;
-// use App\Http\Servicecruds\Couponcrud;
-// use App\Http\Servicecruds\Warehousecrud;
-// use App\Http\Servicecruds\Departmentcrud;
-// use App\Http\Servicecruds\Employeecrud;
-// use App\Http\Servicecruds\Payrollcrud;
-// use App\Http\Servicecruds\StockCountcrud;
-// use App\Http\Servicecruds\Adjustmentcrud;
-// use App\Http\Servicecruds\Transfercrud;
-// use App\Http\Servicecruds\Holidaycrud;
-// use App\Http\Servicecruds\GiftCardcrud;
-// use App\Http\Servicecruds\Customercrud;
-// use App\Http\Servicecruds\DiscountPlancrud;
-// use App\Http\Servicecruds\Promotioncrud;
-// use App\Http\Servicecruds\Barcodecrud;
-// use App\Http\Servicecruds\Suppliercrud;
-// use App\Http\Servicecruds\Billercrud;
-// use App\Http\Servicecruds\Purchasecrud;
-// use App\Http\Servicecruds\Salecrud;
-// use App\Http\Servicecruds\Expensecrud;
-// use App\Http\Servicecruds\Productcrud;
-// use App\Http\Servicecruds\GeneralSettingcrud;
-// use App\Http\Servicecruds\Reportcrud;
-// use App\Http\Servicecruds\Usercrud;
-// use App\Http\Servicecruds\Menucrud;
-// use App\Http\Servicecruds\Pagecrud;
-// use App\Http\Servicecruds\Postcrud;
-
 use App\Http\Servicecruds\{
     Usercrud,
     Menucrud,
@@ -96,7 +59,6 @@ use App\Http\Servicecruds\{
     GiftCardcrud,
     Customercrud,
     DiscountPlancrud,
-
     Promotioncrud,
     Barcodecrud,
     Deliverycrud,
@@ -107,12 +69,17 @@ use App\Http\Servicecruds\{
     Expensecrud,
     Productcrud,
     GeneralSettingcrud,
-    Reportcrud
+    Reportcrud,
+
+    SuperAdmincrud,
+    CustomFieldcrud,
+    SMScrud
 };
 // use App\Models\ImageUpload;
 use App\Models\{
     Account,
     CustomField,
+    Comment,
     Adjustment,
     ProductAdjustment,
     Supplier,
@@ -179,7 +146,6 @@ use ZipArchive;
 class SuperAdminController extends Controller
 {
     use CacheForget;
-
 
     private $images, $thumbnail, $singleimg, $upload, $files;
 
@@ -1600,297 +1566,46 @@ class SuperAdminController extends Controller
     // ======================== Super admin===================
     public function superadminGeneralSetting()
     {
-
-        // dd("kk");
-      $lims_general_setting_data = GeneralSetting::latest()->first();
-      $lims_account_list = Account::where('is_active', true)->get();
-      // $lims_currency_list = Currency::get();
-      $zones_array = array();
-      $timestamp = time();
-      foreach (timezone_identifiers_list() as $key => $zone) {
-          date_default_timezone_set($zone);
-          $zones_array[$key]['zone'] = $zone;
-          $zones_array[$key]['diff_from_GMT'] = 'UTC/GMT ' . date('P', $timestamp);
-      }
-      return view('superadmin.setting.superadmin_setting', compact('lims_general_setting_data', 'lims_account_list', 'zones_array'));
+        return (new SuperAdmincrud)->superadminGeneralSetting();
     }
 
     public function superadminGeneralSettingStore(Request $request)
     {
-        $this->validate($request, [
-            'site_logo' => 'image|mimes:jpg,jpeg,png,gif|max:100000',
-            'og_image' => 'image|mimes:jpg,jpeg,png|max:100000',
-        ]);
-        $data = $request->except('site_logo');
-        // return $data;
-        if(isset($data['is_rtl']))
-            $data['is_rtl'] = true;
-        else
-            $data['is_rtl'] = false;
-        $general_setting = GeneralSetting::latest()->first();
-        if (!empty($general_setting)) {
-            $general_setting->id = 1;
-            if(isset($data['is_zatca'])) {
-                $general_setting->is_zatca = true;
-            }
-            else{
-                $general_setting->is_zatca = false;
-            }
-            $general_setting->site_title = $data['site_title'];
-            $general_setting->is_rtl = $data['is_rtl'];
-            $general_setting->phone = $data['phone'];
-            $general_setting->company_name = $data['company_name'];
-            $general_setting->email = $data['email'];
-            $general_setting->free_trial_limit = $data['free_trial_limit'];
-            $general_setting->date_format = $data['date_format'];
-            $general_setting->expiry_date = $data['expiry_date'];
-            $general_setting->without_stock = $data['without_stock'];
-            $general_setting->staff_access = $data['staff_access'];
-            $general_setting->state = $data['state'];
-            $general_setting->staff_access = $data['staff_access'];
-            $general_setting->currency_position = $data['currency_position'];
-            $general_setting->invoice_format = $data['invoice_format'];
-            // $general_setting->dedicated_ip = $data['dedicated_ip'];
-            // $general_setting->currency = $data['currency'];
-            $general_setting->developed_by = $data['developed_by'];
-            $logo = $request->site_logo;
-            $logo = $request->site_logo;
-            if ($logo) {
-                $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
-                $logoName = date("Ymdhis") . '.' . $ext;
-                $logo->move('public/logo', $logoName);
-                $general_setting->site_logo = $logoName;
-            }
-        } else {
-              $general_setting = new GeneralSetting();
-            $general_setting->id = 1;
-            if(isset($data['is_zatca'])) {
-                $general_setting->is_zatca = true;
-            }
-            else{
-                $general_setting->is_zatca = false;
-            }
-            $general_setting->site_title = $data['site_title'];
-            $general_setting->is_rtl = $data['is_rtl'];
-            $general_setting->phone = $data['phone'];
-            $general_setting->company_name = $data['company_name'];
-            $general_setting->email = $data['email'];
-            $general_setting->free_trial_limit = $data['free_trial_limit'];
-            $general_setting->date_format = $data['date_format'];
-            $general_setting->expiry_date = $data['expiry_date'];
-            $general_setting->without_stock = $data['without_stock'];
-            $general_setting->state = $data['state'];
-            $general_setting->staff_access = $data['staff_access'];
-            $general_setting->currency_position = $data['currency_position'];
-            $general_setting->invoice_format = $data['invoice_format'];
-            // $general_setting->dedicated_ip = $data['dedicated_ip'];
-            // $general_setting->currency = $data['currency'];
-            $general_setting->developed_by = $data['developed_by'];
-            $logo = $request->site_logo;
-            $logo = $request->site_logo;
-            if ($logo) {
-                $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
-                $logoName = date("Ymdhis") . '.' . $ext;
-                $logo->move('public/logo', $logoName);
-                $general_setting->site_logo = $logoName;
-            }
-        }
-
-
-        $this->cacheForget('general_setting');
-        $general_setting->save();
-        return redirect()->back()->with('message', 'Data updated successfully');
+        return (new SuperAdmincrud)->superadminGeneralSettingStore($request);
     }
 
     public function superadminMailSetting()
     {
-        $mail_setting_data = MailSetting::latest()->first();
-        return view('landlord.mail_setting', compact('mail_setting_data'));
+        return (new SuperAdmincrud)->superadminMailSetting();
     }
 
     public function superadminMailSettingStore(Request $request)
     {
-        $data = $request->all();
-        $mail_setting->driver = $data['driver'];
-        $mail_setting->host = $data['host'];
-        $mail_setting->port = $data['port'];
-        $mail_setting->from_address = $data['from_address'];
-        $mail_setting->from_name = $data['from_name'];
-        $mail_setting->username = $data['username'];
-        $mail_setting->password = $data['password'];
-        $mail_setting->encryption = $data['encryption'];
-        $mail_setting->save();
-        return redirect()->back()->with('message', 'Data updated successfully');
+        return (new SuperAdmincrud)->superadminMailSettingStore($request);
     }
 
-   // ======================== SMS Setting===================
-   public function smsSetting()
-  {
-      return view('superadmin.setting.sms_setting');
+    // ======================== SMS Setting===================
+    public function smsSetting()
+    {
+      return (new SMScrud)->smsSetting();
   }
   public function smsSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
-        $data = $request->all();
-        //writting bulksms info in .env file
-        $path = app()->environmentFilePath();
-        if($data['gateway'] == 'twilio'){
-            $searchArray = array('SMS_GATEWAY='.env('SMS_GATEWAY'), 'ACCOUNT_SID='.env('ACCOUNT_SID'), 'AUTH_TOKEN='.env('AUTH_TOKEN'), 'Twilio_Number='.env('Twilio_Number') );
-
-            $replaceArray = array('SMS_GATEWAY='.$data['gateway'], 'ACCOUNT_SID='.$data['account_sid'], 'AUTH_TOKEN='.$data['auth_token'], 'Twilio_Number='.$data['twilio_number'] );
-        }
-        else{
-            $searchArray = array( 'SMS_GATEWAY='.env('SMS_GATEWAY'), 'CLICKATELL_API_KEY='.env('CLICKATELL_API_KEY') );
-            $replaceArray = array( 'SMS_GATEWAY='.$data['gateway'], 'CLICKATELL_API_KEY='.$data['api_key'] );
-        }
-
-        file_put_contents($path, str_replace($searchArray, $replaceArray, file_get_contents($path)));
-        return redirect()->back()->with('message', 'Data updated successfully');
+        return (new SMScrud)->smsSettingStore($request);
     }
   public function createSms()
   {
-      $lims_customer_list = Customer::where('is_active', true)->get();
-      return view('superadmin.setting.create_sms', compact('lims_customer_list'));
+    return (new SMScrud)->createSms();
   }
 
   public function sendSms(Request $request)
   {
-      $data = $request->all();
-      $numbers = explode(",", $data['mobile']);
-
-      if( env('SMS_GATEWAY') == 'twilio') {
-          $account_sid = env('ACCOUNT_SID');
-          $auth_token = env('AUTH_TOKEN');
-          $twilio_phone_number = env('Twilio_Number');
-          try{
-              $client = new Client($account_sid, $auth_token);
-              foreach ($numbers as $number) {
-                  $client->messages->create(
-                      $number,
-                      array(
-                          "from" => $twilio_phone_number,
-                          "body" => $data['message']
-                      )
-                  );
-              }
-          }
-          catch(\Exception $e){
-              //return $e;
-              return redirect()->back()->with('not_permitted', 'Please setup your <a href="sms_setting">SMS Setting</a> to send SMS.');
-          }
-          $message = "SMS sent successfully";
-      }
-      elseif( env('SMS_GATEWAY') == 'clickatell') {
-          try {
-              $clickatell = new \Clickatell\Rest(env('CLICKATELL_API_KEY'));
-              foreach ($numbers as $number) {
-                  $result = $clickatell->sendMessage(['to' => [$number], 'content' => $data['message']]);
-              }
-          }
-          catch (ClickatellException $e) {
-              return redirect()->back()->with('not_permitted', 'Please setup your <a href="sms_setting">SMS Setting</a> to send SMS.');
-          }
-          $message = "SMS sent successfully";
-      }
-      else
-          return redirect()->back()->with('not_permitted', 'Please setup your <a href="sms_setting">SMS Setting</a> to send SMS.');
-      return redirect()->back()->with('message', $message);
+    return (new SMScrud)->sendSms($request);
   }
 
   public function backup()
   {
-
-
-      // Database configuration
-      $host = env('DB_HOST');
-      $username = env('DB_USERNAME');
-      $password = env('DB_PASSWORD');
-      $database_name = env('DB_DATABASE');
-      // Get connection object and set the charset
-      $conn = mysqli_connect($host, $username, $password, $database_name);
-      $conn->set_charset("utf8");
-
-
-      // Get All Table Names From the Database
-      $tables = array();
-      $sql = "SHOW TABLES";
-      $result = mysqli_query($conn, $sql);
-
-      while ($row = mysqli_fetch_row($result)) {
-          $tables[] = $row[0];
-      }
-
-      $sqlScript = "";
-      foreach ($tables as $table) {
-
-          // Prepare SQLscript for creating table structure
-          $query = "SHOW CREATE TABLE $table";
-          $result = mysqli_query($conn, $query);
-          $row = mysqli_fetch_row($result);
-
-          $sqlScript .= "\n\n" . $row[1] . ";\n\n";
-
-
-          $query = "SELECT * FROM $table";
-          $result = mysqli_query($conn, $query);
-
-          $columnCount = mysqli_num_fields($result);
-
-          // Prepare SQLscript for dumping data for each table
-          for ($i = 0; $i < $columnCount; $i ++) {
-              while ($row = mysqli_fetch_row($result)) {
-                  $sqlScript .= "INSERT INTO $table VALUES(";
-                  for ($j = 0; $j < $columnCount; $j ++) {
-                      $row[$j] = $row[$j];
-
-                      if (isset($row[$j])) {
-                          $sqlScript .= '"' . $row[$j] . '"';
-                      } else {
-                          $sqlScript .= '""';
-                      }
-                      if ($j < ($columnCount - 1)) {
-                          $sqlScript .= ',';
-                      }
-                  }
-                  $sqlScript .= ");\n";
-              }
-          }
-
-          $sqlScript .= "\n";
-      }
-
-      if(!empty($sqlScript))
-      {
-          // Save the SQL script to a backup file
-          $backup_file_name = public_path().'/'.$database_name . '_backup_' . time() . '.sql';
-          //return $backup_file_name;
-          $fileHandler = fopen($backup_file_name, 'w+');
-          $number_of_lines = fwrite($fileHandler, $sqlScript);
-          fclose($fileHandler);
-
-          $zip = new ZipArchive();
-          $zipFileName = $database_name . '_backup_' . time() . '.zip';
-          $zip->open(public_path() . '/' . $zipFileName, ZipArchive::CREATE);
-          $zip->addFile($backup_file_name, $database_name . '_backup_' . time() . '.sql');
-          $zip->close();
-
-          // Download the SQL backup file to the browser
-          /*header('Content-Description: File Transfer');
-          header('Content-Type: application/octet-stream');
-          header('Content-Disposition: attachment; filename=' . basename($backup_file_name));
-          header('Content-Transfer-Encoding: binary');
-          header('Expires: 0');
-          header('Cache-Control: must-revalidate');
-          header('Pragma: public');
-          header('Content-Length: ' . filesize($backup_file_name));
-          ob_clean();
-          flush();
-          readfile($backup_file_name);
-          exec('rm ' . $backup_file_name); */
-      }
-      return redirect('public/' . $zipFileName);
+      return (new SMScrud)->backup();
   }
     // ======================== RewardPointSetting===================
     public function rewardPointSetting(Request $request)
@@ -2584,6 +2299,13 @@ class SuperAdminController extends Controller
         ]);
         return (new Usercrud)->userstore($request);
     }
+    public function profileUpdate(Request $request, $id)
+    {
+        $input = $request->all();
+        $lims_user_data = User::find($id);
+        $lims_user_data->update($input);
+        return redirect()->back()->with('message3', 'Data updated successfullly');
+    }
     public function usershow($id)
     {
         return (new Usercrud)->usershow($id);
@@ -2731,191 +2453,31 @@ class SuperAdminController extends Controller
     }
 
     // ==========================custom field
-    public function customindex()
+    public function customindex(Request $request)
     {
-
-            $lims_custom_field_all = CustomField::orderBy('id', 'desc')->get();
-            return view('superadmin.custom_field.index', compact('lims_custom_field_all'));
-
+        return (new CustomFieldcrud)->customindex($request);
     }
-
     public function customcreate()
     {
-
-            return view('superadmin.custom_field.create');
-
+        return view('superadmin.custom_field.create');
     }
-
     public function customstore(Request $request)
     {
-        $data = $request->all();
-        //adding column to specific database
-        if($data['belongs_to'] == 'sale')
-            $table_name = 'sales';
-        elseif($data['belongs_to'] == 'purchase')
-            $table_name = 'purchases';
-        elseif($data['belongs_to'] == 'product')
-            $table_name = 'products';
-        elseif($data['belongs_to'] == 'customer')
-            $table_name = 'customers';
-
-        $column_name = str_replace(" ", "_", strtolower($data['name']));
-
-        if($data['type'] == 'number')
-            $data_type = 'double';
-        elseif($data['type'] == 'textarea')
-            $data_type = 'text';
-        else
-            $data_type = 'varchar(255)';
-        $sqlStatement = "ALTER TABLE ". $table_name . " ADD " . $column_name . " " . $data_type;
-        if($data['default_value_1']) {
-            $sqlStatement .= " DEFAULT '" . $data['default_value_1'] . "'";
-            $data['default_value'] = $data['default_value_1'];
-        }
-        elseif($data['default_value_2']) {
-            $sqlStatement .= " DEFAULT '" . $data['default_value_2'] . "'";
-            $data['default_value'] = $data['default_value_2'];
-        }
-        DB::insert($sqlStatement);
-        //adding data to custom fields table
-        if(isset($data['is_table']))
-            $data['is_table'] = true;
-        else
-            $data['is_table'] = false;
-
-        if(isset($data['is_invoice']))
-            $data['is_invoice'] = true;
-        else
-            $data['is_invoice'] = false;
-
-        if(isset($data['is_required']))
-            $data['is_required'] = true;
-        else
-            $data['is_required'] = false;
-
-        if(isset($data['is_admin']))
-            $data['is_admin'] = true;
-        else
-            $data['is_admin'] = false;
-
-        if(isset($data['is_disable']))
-            $data['is_disable'] = true;
-        else
-            $data['is_disable'] = false;
-        CustomField::create($data);
-        return redirect()->route('superAdmin.custom-fields')->with('message', 'Custom Field created successfully');
+        return (new CustomFieldcrud)->customstore($request);
     }
-
-
 
     public function customedit($id)
     {
-
-            $custom_field_data = CustomField::find($id);
-            return view('superadmin.custom_field.edit', compact('custom_field_data'));
-
+        return (new CustomFieldcrud)->customedit($id);
     }
 
     public function customupdate(Request $request, $id)
     {
-        $data = $request->all();
-        $lims_custom_field_data = CustomField::find($id);
-        if($data['belongs_to'] == 'sale')
-            $table_name = 'sales';
-        elseif($data['belongs_to'] == 'product')
-            $table_name = 'products';
-        elseif($data['belongs_to'] == 'purchase')
-            $table_name = 'purchases';
-        elseif($data['belongs_to'] == 'customer')
-            $table_name = 'customers';
-        $column_name = str_replace(" ", "_", strtolower($data['name']));
-        if($data['type'] == 'number')
-            $data_type = 'double';
-        elseif($data['type'] == 'textarea')
-            $data_type = 'text';
-        else
-            $data_type = 'varchar(255)';
-
-        if($data['name'] == $lims_custom_field_data->name)
-            $action = " MODIFY ";
-        else
-            $action = " RENAME ";
-        //deleting previous custom column if necessary
-        if($data['belongs_to'] != $lims_custom_field_data->belongs_to) {
-            if($lims_custom_field_data->belongs_to == 'sale')
-                $old_table_name = 'sales';
-            elseif($lims_custom_field_data->belongs_to == 'purchase')
-                $old_table_name = 'purchases';
-            elseif($lims_custom_field_data->belongs_to == 'product')
-                $old_table_name = 'products';
-            elseif($lims_custom_field_data->belongs_to == 'customer')
-                $old_table_name = 'customers';
-            $column_name = str_replace(" ", "_", strtolower($lims_custom_field_data->name));
-            $sqlStatement = "ALTER TABLE ". $old_table_name . " DROP COLUMN " . $column_name;
-            DB::insert($sqlStatement);
-            $action = " ADD ";
-        }
-        elseif($data['type'] == 'number' && $data['type'] != $lims_custom_field_data->type) {
-            $column_name = str_replace(" ", "_", strtolower($lims_custom_field_data->name));
-            $sqlStatement = "ALTER TABLE ". $table_name . " DROP COLUMN " . $column_name;
-            DB::insert($sqlStatement);
-            $action = " ADD ";
-        }
-        //adding column to specific database
-        $sqlStatement = "ALTER TABLE ". $table_name . $action . $column_name . " " . $data_type;
-        if($data['default_value_1']) {
-            $sqlStatement .= " DEFAULT '" . $data['default_value_1'] . "'";
-            $data['default_value'] = $data['default_value_1'];
-        }
-        elseif($data['default_value_2']) {
-            $sqlStatement .= " DEFAULT '" . $data['default_value_2'] . "'";
-            $data['default_value'] = $data['default_value_2'];
-        }
-        DB::insert($sqlStatement);
-        //updating data to custom fields table
-        if(isset($data['is_table']))
-            $data['is_table'] = true;
-        else
-            $data['is_table'] = false;
-
-        if(isset($data['is_invoice']))
-            $data['is_invoice'] = true;
-        else
-            $data['is_invoice'] = false;
-
-        if(isset($data['is_required']))
-            $data['is_required'] = true;
-        else
-            $data['is_required'] = false;
-
-        if(isset($data['is_admin']))
-            $data['is_admin'] = true;
-        else
-            $data['is_admin'] = false;
-
-        if(isset($data['is_disable']))
-            $data['is_disable'] = true;
-        else
-            $data['is_disable'] = false;
-        $lims_custom_field_data->update($data);
-        return redirect()->route('superAdmin.custom-fields')->with('message', 'Custom Field updated successfully');
+        return (new CustomFieldcrud)->customupdate($request, $id);
     }
 
     public function destroy($id)
     {
-        $custom_field_data = CustomField::find($id);
-        if($custom_field_data->belongs_to == 'sale')
-            $table_name = 'sales';
-        elseif($custom_field_data->belongs_to == 'product')
-            $table_name = 'products';
-        elseif($custom_field_data->belongs_to == 'purchase')
-            $table_name = 'purchases';
-        elseif($custom_field_data->belongs_to == 'customer')
-            $table_name = 'customers';
-        $column_name = str_replace(" ", "_", strtolower($custom_field_data->name));
-        $sqlStatement = "ALTER TABLE ". $table_name . " DROP COLUMN " . $column_name;
-        DB::insert($sqlStatement);
-        $custom_field_data->delete();
-        return redirect()->back()->with('not_permitted', 'Custom Field deleted successfully!');
+        return (new CustomFieldcrud)->destroy($id);
     }
 }

@@ -33,6 +33,24 @@ Route::group(['prefix' => 'superAdmin', 'as' => 'superAdmin.','middleware' => ['
     Route::get('/databasebackup', [App\Http\Controllers\SuperAdminController::class, 'databasebackup'])->name('databasebackup');
     Route::get('/loginhistory', [App\Http\Controllers\SuperAdminController::class, 'loginhistory'])->name('loginhistory');
     // Route::post('/submail', [App\Http\Controllers\SuperAdminController::class, 'submail'])->name('submail');
+    
+    
+
+    
+    // Route::controller(HomeController::class)->group(function () {
+      
+    //     Route::get('/yearly-best-selling-price', 'yearlyBestSellingPrice');
+    //     Route::get('/yearly-best-selling-qty', 'yearlyBestSellingQty');
+    //     Route::get('/monthly-best-selling-qty', 'monthlyBestSellingQty');
+    //     Route::get('/recent-sale', 'recentSale');
+    //     Route::get('/recent-purchase', 'recentPurchase');
+    //     Route::get('/recent-quotation', 'recentQuotation');
+    //     Route::get('/recent-payment', 'recentPayment');
+    //     Route::get('switch-theme/{theme}', 'switchTheme')->name('switchTheme');
+    //     Route::get('/dashboard-filter/{start_date}/{end_date}', 'dashboardFilter');
+    //     Route::get('addon-list', 'addonList');
+    //     Route::get('my-transactions/{year}/{month}', 'myTransaction');
+    // });
 
     // Users
     Route::get('users', [App\Http\Controllers\SuperAdminController::class, 'users'])->name('users');
@@ -49,6 +67,7 @@ Route::group(['prefix' => 'superAdmin', 'as' => 'superAdmin.','middleware' => ['
     Route::get('/users.fetch', [App\Http\Controllers\SuperAdminController::class, 'usersfetch'])->name('users.fetch');
     Route::get('/users.delete', [App\Http\Controllers\SuperAdminController::class, 'usersuploaddelete'])->name('users.delete');
     Route::post('/users.search', [App\Http\Controllers\SuperAdminController::class, 'userssearch'])->name('users.search');
+    Route::put('user/update_profile/{id}', [App\Http\Controllers\SuperAdminController::class, 'profileUpdate'])->name('user.profileUpdate');
 
     // Admin role
     Route::get('/roles', [App\Http\Controllers\SuperAdminController::class, 'roles'])->name('roles');

@@ -15,7 +15,7 @@
         @if($general_setting->site_logo)
         <a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="115"></a>
         @else
-        <a href="{{url('/')}}"><h1 class="d-inline">{{$general_setting->site_title}}</h1></a>
+        <a href="{{url('/')}}"><h1 class="d-inline">  {{$general_setting->site_title}}</h1></a>
         @endif
     </span>
 
@@ -31,7 +31,6 @@
             </audio>
             <audio id="mysoundclip2" preload="auto">
                 <source src="{{url('beep/beep-07.mp3')}}"></source>
-                {{-- <source src="{{asset('beep/beep-07.mp3')}}"></source> --}}
             </audio>
             <div class="col-md-6">
                 <div class="card">
@@ -46,17 +45,18 @@
                             $customer_active = DB::table('permissions')
                               ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
                               ->where([
+                                ['permissions.name', 'customers-add'],
                                 ['role_id', \Auth::user()->role_id] ])->first();
                         @endphp
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                       <div class="form-group">
                                           <input type="text" name="created_at" class="form-control date" placeholder="Choose date" onkeyup='saveValue(this);'/>
                                       </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                       <div class="form-group">
                                           <input type="text" id="reference-no" name="reference_no" class="form-control" placeholder="Type reference number" onkeyup='saveValue(this);'/>
                                       </div>
@@ -66,18 +66,42 @@
                                         </span>
                                         @endif
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            @if($limspossettingdata)
-                                            <input type="hidden" name="warehouse_id_hidden" value="{{$limspossettingdata->warehouse_id}}">
-                                            @endif
-                                            <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
-                                                @foreach($limswarehouselist as $warehouse)
-                                                <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                                @endforeach
-                                            </select>
+                                    @if($limspossettingdata->is_table)
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                @if($limspossettingdata)
+                                                <input type="hidden" name="warehouse_id_hidden" value="{{$limspossettingdata->warehouse_id}}">
+                                                @endif
+                                                <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                                                    @foreach($limswarehouselist as $warehouse)
+                                                    <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <select required id="table_id" name="table_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select table...">
+                                                    @foreach($limstablelist as $table)
+                                                    <option value="{{$table->id}}">{{$table->name}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                @if($limspossettingdata)
+                                                <input type="hidden" name="warehouse_id_hidden" value="{{$limspossettingdata->warehouse_id}}">
+                                                @endif
+                                                <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                                                    @foreach($limswarehouselist as $warehouse)
+                                                    <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @endif
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             @if($limspossettingdata)
@@ -98,10 +122,10 @@
                                             <div class="input-group pos">
                                                 @if($customer_active)
                                                 <select required name="customer_id" id="customer_id" class="selectpicker form-control" data-live-search="true" title="Select customer..." style="width: 100px">
-                                                @php
+                                                <?php
                                                   $deposit = [];
                                                   $points = [];
-                                                @endphp
+                                                ?>
                                                 @foreach($limscustomerlist as $customer)
                                                     @php
                                                       $deposit[$customer->id] = $customer->deposit - $customer->expense;
@@ -113,10 +137,10 @@
                                                 </select>
                                                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#addCustomer"><i class="dripicons-plus"></i></button>
                                                 @else
-                                                @php
+                                                <?php
                                                   $deposit = [];
                                                   $points = [];
-                                                @endphp
+                                                ?>
                                                 <select required name="customer_id" id="customer_id" class="selectpicker form-control" data-live-search="true" title="Select customer...">
                                                 @foreach($limscustomerlist as $customer)
                                                     @php
@@ -131,6 +155,71 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {{-- <div class="col-md-2">
+                                        <select name="currency_id" id="currency" class="form-control selectpicker" data-toggle="tooltip" title="" data-original-title="Sale currency">
+                                            @foreach($currency_list as $currency_data)
+                                            <option value="{{$currency_data->id}}" data-rate="{{$currency_data->exchange_rate}}">{{$currency_data->code}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group d-flex">
+                                            <input class="form-control" type="text" id="exchange_rate" name="exchange_rate" value="{{$currency->exchange_rate}}">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" data-toggle="tooltip" title="" data-original-title="currency exchange rate">i</span>
+                                            </div>
+                                        </div>
+                                    </div> --}}
+                                    @foreach($customfields as $field)
+                                        @if(!$field->is_admin || \Auth::user()->role_id == 1)
+                                            <div class="{{'col-md-'.$field->grid_value}}">
+                                                <div class="form-group">
+                                                    <label>{{$field->name}}</label>
+                                                    @if($field->type == 'text')
+                                                        <input type="text" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif>
+                                                    @elseif($field->type == 'number')
+                                                        <input type="number" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif>
+                                                    @elseif($field->type == 'textarea')
+                                                        <textarea rows="5" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif></textarea>
+                                                    @elseif($field->type == 'checkbox')
+                                                        <br>
+                                                        <?php $option_values = explode(",", $field->option_value); ?>
+                                                        @foreach($option_values as $value)
+                                                            <label>
+                                                                <input type="checkbox" name="{{str_replace(' ', '_', strtolower($field->name))}}[]" value="{{$value}}" @if($value == $field->default_value){{'checked'}}@endif @if($field->is_required){{'required'}}@endif> {{$value}}
+                                                            </label>
+                                                            &nbsp;
+                                                        @endforeach
+                                                    @elseif($field->type == 'radio_button')
+                                                        <br>
+                                                        <?php $option_values = explode(",", $field->option_value); ?>
+                                                        @foreach($option_values as $value)
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$value}}" @if($value == $field->default_value){{'checked'}}@endif @if($field->is_required){{'required'}}@endif> {{$value}}
+                                                            </label>
+                                                            &nbsp;
+                                                        @endforeach
+                                                    @elseif($field->type == 'select')
+                                                        <?php $option_values = explode(",", $field->option_value); ?>
+                                                        <select class="form-control" name="{{str_replace(' ', '_', strtolower($field->name))}}" @if($field->is_required){{'required'}}@endif>
+                                                            @foreach($option_values as $value)
+                                                                <option value="{{$value}}" @if($value == $field->default_value){{'selected'}}@endif>{{$value}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @elseif($field->type == 'multi_select')
+                                                        <?php $option_values = explode(",", $field->option_value); ?>
+                                                        <select class="form-control" name="{{str_replace(' ', '_', strtolower($field->name))}}[]" @if($field->is_required){{'required'}}@endif multiple>
+                                                            @foreach($option_values as $value)
+                                                                <option value="{{$value}}" @if($value == $field->default_value){{'selected'}}@endif>{{$value}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @elseif($field->type == 'date_picker')
+                                                        <input type="text" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control date" @if($field->is_required){{'required'}}@endif>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endforeach
                                     <div class="col-md-12">
                                         <div class="search-box form-group">
                                             <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Scan/Search product by name/code" class="form-control"  />
@@ -162,12 +251,12 @@
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <input type="hidden" name="total_discount" value="0.00" />
+                                            <input type="hidden" name="total_discount" value="{{number_format(0, 2, '.', '')}}" />
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <input type="hidden" name="total_tax" value="0.00"/>
+                                            <input type="hidden" name="total_tax" value="{{number_format(0, 2, '.', '')}}"/>
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -186,7 +275,7 @@
                                             <input type="hidden" name="grand_total" />
                                             <input type="hidden" name="used_points" />
                                             <input type="hidden" name="coupon_discount" />
-                                            <input type="hidden" name="sale_status" class="saleId" value="1" />
+                                            <input type="hidden" name="sale_status" value="1" />
                                             <input type="hidden" name="coupon_active">
                                             <input type="hidden" name="coupon_id">
                                             <input type="hidden" name="coupon_discount" />
@@ -202,19 +291,19 @@
                                             <span class="totals-title">{{trans('Items')}}</span><span id="item">0</span>
                                         </div>
                                         <div class="col-sm-4">
-                                            <span class="totals-title">{{trans('Total')}}</span><span id="subtotal">0.00</span>
+                                            <span class="totals-title">{{trans('Total')}}</span><span id="subtotal">{{number_format(0, 2, '.', '')}}</span>
                                         </div>
                                         <div class="col-sm-4">
-                                            <span class="totals-title">{{trans('Discount')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#order-discount-modal"> <i class="dripicons-document-edit"></i></button></span><span id="discount">0.00</span>
+                                            <span class="totals-title">{{trans('Discount')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#order-discount-modal"> <i class="dripicons-document-edit"></i></button></span><span id="discount">{{number_format(0, 2, '.', '')}}</span>
                                         </div>
                                         <div class="col-sm-4">
-                                            <span class="totals-title">{{trans('Coupon')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#coupon-modal"><i class="dripicons-document-edit"></i></button></span><span id="coupon-text">0.00</span>
+                                            <span class="totals-title">{{trans('Coupon')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#coupon-modal"><i class="dripicons-document-edit"></i></button></span><span id="coupon-text">{{number_format(0, 2, '.', '')}}</span>
                                         </div>
                                         <div class="col-sm-4">
-                                            <span class="totals-title">{{trans('Tax')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#order-tax"><i class="dripicons-document-edit"></i></button></span><span id="tax">0.00</span>
+                                            <span class="totals-title">{{trans('Tax')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#order-tax"><i class="dripicons-document-edit"></i></button></span><span id="tax">{{number_format(0, 2, '.', '')}}</span>
                                         </div>
                                         <div class="col-sm-4">
-                                            <span class="totals-title">{{trans('Shipping')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#shipping-cost-modal"><i class="dripicons-document-edit"></i></button></span><span id="shipping-cost">0.00</span>
+                                            <span class="totals-title">{{trans('Shipping')}} <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#shipping-cost-modal"><i class="dripicons-document-edit"></i></button></span><span id="shipping-cost">{{number_format(0, 2, '.', '')}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -222,70 +311,53 @@
                         </div>
                     </div>
                     <div class="payment-amount">
-                        <h2>{{trans('grand total')}} <span id="grand-total">0.00</span></h2>
+                        <h2>{{trans('grand total')}} <span id="grand-total">{{number_format(0, 2, '.', '')}}</span></h2>
                     </div>
-                    @php
-                        $jsonData = json_decode($limspossettingdata->options);
-                        $value = explode(',', $jsonData);
-                        // print_r($value);
-                    @endphp
                     <div class="payment-options">
-                        @foreach ($value as $val )
-                            @if($val == "cash")
-                                <div class="column-5">
-                                    <button style="background: #00cec9" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="cash-btn"><i class="fa fa-money"></i> {{trans('Cash')}}</button>
-                                </div>
-                            @endif
-                        @endforeach
-                        @foreach ($value as $val )
-                            @if($val == "card")
-                                <div class="column-5">
-                                    <button style="background: #0984e3" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="credit-card-btn"><i class="fa fa-credit-card"></i> {{trans('Card')}}</button>
-                                </div>
-                            @endif
-                        @endforeach
-                        @foreach ($value as $val )
-                            @if($val == "cheque")
-                                <div class="column-5">
-                                    <button style="background-color: #fd7272" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="cheque-btn"><i class="fa fa-money"></i> {{trans('Cheque')}}</button>
-                                </div>
-                            @endif
-                        @endforeach
-                        @foreach ($value as $val )
-                            @if($val == "gift_card")
-                                <div class="column-5">
-                                    <button style="background-color:  #b33771" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="gift-card-btn"><i class="fa fa-credit-card-alt"></i> {{trans('Gift Card')}}</button>
-                                </div>
-                            @endif
-                        @endforeach
-                        @foreach ($value as $val )
-                            @if($val == "deposit")
-                                <div class="column-5">
-                                    <button style="background-color:  #5f27cd" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="deposit-btn"><i class="fa fa-university"></i> {{trans('Deposit')}}</button>
-                                </div>
-                            @endif
-                        @endforeach
-                        @foreach ($value as $val )
-                            @if($val == "paypal")
-                                <div class="column-5">
-                                    <button style="background-color: #213170" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="paypal-btn"><i class="fa fa-paypal"></i> {{trans('PayPal')}}</button>
-                                </div>
-                            @endif
-                        @endforeach
-                        <div class="column-5">
-                            <button style="background-color: #e28d02" type="button" class="btn btn-custom" id="draft-btn"><i class="dripicons-flag"></i> {{trans('Draft')}}</button>
-                        </div>
 
-                        @if(!empty($limsrewardpointsettingdata->is_active))
+                        @if(in_array("card",$options))
                         <div class="column-5">
-                            <button style="background-color: #319398" type="button" class="btn btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="point-btn"><i class="dripicons-rocket"></i> {{trans('Points')}}</button>
+                            <button style="background: #0984e3" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="credit-card-btn"><i class="fa fa-credit-card"></i> {{trans('Card')}}</button>
+                        </div>
+                        @endif
+                        @if(in_array("cash",$options))
+                        <div class="column-5">
+                            <button style="background: #00cec9" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="cash-btn"><i class="fa fa-money"></i> {{trans('Cash')}}</button>
+                        </div>
+                        @endif
+                        @if(in_array("paypal",$options) && $limspossettingdata && (strlen($limspossettingdata->paypal_live_api_username)>0) && (strlen($limspossettingdata->paypal_live_api_password)>0) && (strlen($limspossettingdata->paypal_live_api_secret)>0))
+                        <div class="column-5">
+                            <button style="background-color: #213170" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="paypal-btn"><i class="fa fa-paypal"></i> {{trans('PayPal')}}</button>
                         </div>
                         @endif
                         <div class="column-5">
-                            <button style="background-color: #d63031;" type="button" class="btn btn-custom" id="cancel-btn" onclick="return confirmCancel()"><i class="fa fa-close"></i> {{trans('Cancel')}}</button>
+                            <button style="background-color: #e28d02" type="button" class="btn btn-sm btn-custom" id="draft-btn"><i class="dripicons-flag"></i> {{trans('Draft')}}</button>
+                        </div>
+                        @if(in_array("cheque",$options))
+                        <div class="column-5">
+                            <button style="background-color: #fd7272" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="cheque-btn"><i class="fa fa-money"></i> {{trans('Cheque')}}</button>
+                        </div>
+                        @endif
+                        @if(in_array("gift_card",$options))
+                        <div class="column-5">
+                            <button style="background-color: #5f27cd" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="gift-card-btn"><i class="fa fa-credit-card-alt"></i> {{trans('Gift Card')}}</button>
+                        </div>
+                        @endif
+                        @if(in_array("deposit",$options))
+                        <div class="column-5">
+                            <button style="background-color: #b33771" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="deposit-btn"><i class="fa fa-university"></i> {{trans('Deposit')}}</button>
+                        </div>
+                        @endif
+                        @if($limsrewardpointsettingdata && $limsrewardpointsettingdata->is_active)
+                        <div class="column-5">
+                            <button style="background-color: #319398" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="point-btn"><i class="dripicons-rocket"></i> {{trans('Points')}}</button>
+                        </div>
+                        @endif
+                        <div class="column-5">
+                            <button style="background-color: #d63031;" type="button" class="btn btn-sm btn-custom" id="cancel-btn" onclick="return confirmCancel()"><i class="fa fa-close"></i> {{trans('Cancel')}}</button>
                         </div>
                         <div class="column-5">
-                            <button style="background-color: #ffc107;" type="button" class="btn btn-custom" data-toggle="modal" data-target="#recentTransaction"><i class="dripicons-clock"></i> {{trans('Recent Transaction')}}</button>
+                            <button style="background-color: #ffc107;" type="button" class="btn btn-sm btn-custom" data-toggle="modal" data-target="#recentTransaction"><i class="dripicons-clock"></i> {{trans('Recent Transaction')}}</button>
                         </div>
                     </div>
                 </div>
@@ -302,29 +374,41 @@
                             <div class="row">
                                 <div class="col-md-10">
                                     <div class="row">
-                                        <div class="col-md-6 mt-1">
+                                        <div class="col-md-3 mt-1">
                                             <label>{{trans('Recieved Amount')}} *</label>
                                             <input type="text" name="paying_amount" class="form-control numkey" required step="any">
                                         </div>
-                                        <div class="col-md-6 mt-1">
+                                        <div class="col-md-3 mt-1">
                                             <label>{{trans('Paying Amount')}} *</label>
                                             <input type="text" name="paid_amount" class="form-control numkey"  step="any">
                                         </div>
-                                        <div class="col-md-6 mt-1">
+                                        <div class="col-md-3 mt-1">
                                             <label>{{trans('Change')}} : </label>
-                                            <p id="change" class="ml-2">0.00</p>
+                                            <p id="change" class="ml-2">{{number_format(0, 2, '.', '')}}</p>
                                         </div>
-                                        <div class="col-md-6 mt-1">
+                                        <div class="col-md-3 mt-1">
                                             <input type="hidden" name="paid_by_id">
                                             <label>{{trans('Paid By')}}</label>
                                             <select name="paid_by_id_select" class="form-control selectpicker">
+                                                @if(in_array("cash",$options))
                                                 <option value="1">Cash</option>
+                                                @endif
+                                                @if(in_array("gift_card",$options))
                                                 <option value="2">Gift Card</option>
+                                                @endif
+                                                @if(in_array("card",$options))
                                                 <option value="3">Credit Card</option>
+                                                @endif
+                                                @if(in_array("cheque",$options))
                                                 <option value="4">Cheque</option>
+                                                @endif
+                                                @if(in_array("paypal",$options) && (strlen(env('PAYPAL_LIVE_API_USERNAME'))>0) && (strlen(env('PAYPAL_LIVE_API_PASSWORD'))>0) && (strlen(env('PAYPAL_LIVE_API_SECRET'))>0))
                                                 <option value="5">Paypal</option>
+                                                @endif
+                                                @if(in_array("deposit",$options))
                                                 <option value="6">Deposit</option>
-                                                @if(!empty($limsrewardpointsettingdata->is_active))
+                                                @endif
+                                                @if($limsrewardpointsettingdata && $limsrewardpointsettingdata->is_active)
                                                 <option value="7">Points</option>
                                                 @endif
                                             </select>
@@ -349,7 +433,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 form-group">
+                                       <div class="col-md-6 form-group">
                                             <label>{{trans('Sale Note')}}</label>
                                             <textarea rows="3" class="form-control" name="sale_note"></textarea>
                                         </div>
@@ -474,9 +558,46 @@
 
                         <div class="navbar-header">
                           <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
-                            <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="Full Screen"><i class="dripicons-expand"></i></a></li>
+                            <div class="dropdown">
+                              <a class="btn-pos btn-sm" type="button" data-toggle="dropdown" aria-expanded="false">
+                                <i class="dripicons-plus"></i>
+                              </a>
+                              <ul class="dropdown-menu">
+                                  <li class="dropdown-item"><a data-toggle="modal" data-target="#category-modal">{{__('Add Category')}}</a></li>
+                                  <li class="dropdown-item"><a href="{{route('superAdmin.products.create')}}">{{__('add_product')}}</a></li>
+                                  <li class="dropdown-item"><a href="{{route('superAdmin.purchase.create')}}">{{trans('Add Purchase')}}</a></li>
+                                  <li class="dropdown-item"><a href="{{route('superAdmin.sale.create')}}">{{trans('Add Sale')}}</a></li>
 
+                                <li class="dropdown-item"><a data-toggle="modal" data-target="#expense-modal"> {{trans('Add Expense')}}</a></li>
+                                {{-- <li class="dropdown-item"><a href="{{route('quotations.create')}}">{{trans('Add Quotation')}}</a></li> --}}
+                                <li class="dropdown-item"><a href="{{route('superAdmin.transfers.create')}}">{{trans('Add Transfer')}}</a></li>
+                                <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#add-sale-return"> {{trans('Add Return')}}</a></li>
 
+                                <li class="dropdown-item"><a href="#" data-toggle="modal" data-target="#add-purchase-return"> {{trans('Add Purchase Return')}}</a></li>
+                                {{-- <li class="dropdown-item"><a href="{{route('user.create')}}">{{trans('Add User')}}</a></li> --}}
+                                <li class="dropdown-item"><a href="{{route('superAdmin.customer')}}">{{trans('Add Customer')}}</a></li>
+                                <li class="dropdown-item"><a href="{{route('superAdmin.biller')}}">{{trans('Add Biller')}}</a></li>
+                                <li class="dropdown-item"><a href="{{route('superAdmin.supplier')}}">{{trans('Add Supplier')}}</a></li>
+
+                              </ul>
+                            </div>
+                            <li class="nav-item ml-4"><a id="btnFullscreen" data-toggle="tooltip" title="Full Screen"><i class="dripicons-expand"></i></a></li>
+                            <?php
+                                // $general_setting_permission = $permission_list->where('name', 'general_setting')->first();
+                                // $general_setting_permission_active = DB::table('role_has_permissions')->where([
+                                //             ['permission_id', $general_setting_permission->id],
+                                //             ['role_id', Auth::user()->role_id]
+                                //         ])->first();
+
+                                // $pos_setting_permission = $permission_list->where('name', 'pos_setting')->first();
+
+                                // $pos_setting_permission_active = DB::table('role_has_permissions')->where([
+                                //     ['permission_id', $pos_setting_permission->id],
+                                //     ['role_id', Auth::user()->role_id]
+                                // ])->first();
+                            ?>
+                            {{-- @if($pos_setting_permission_active)
+                            @endif --}}
                             <li class="nav-item"><a class="dropdown-item" data-toggle="tooltip" href="{{route('superAdmin.possetting')}}" title="{{trans('POS Setting')}}"><i class="dripicons-gear"></i></a> </li>
                             <li class="nav-item">
                                 <a href="{{route('superAdmin.sale.printLastReciept')}}" data-toggle="tooltip" title="{{trans('Print Last Reciept')}}"><i class="dripicons-print"></i></a>
@@ -484,30 +605,36 @@
                             <li class="nav-item">
                                 <a href="" id="register-details-btn" data-toggle="tooltip" title="{{trans('Cash Register Details')}}"><i class="dripicons-briefcase"></i></a>
                             </li>
+                            <?php
+                                // $today_sale_permission = $permission_list->where('name', 'today_sale')->first();
+                                // $today_sale_permission_active = DB::table('role_has_permissions')->where([
+                                //             ['permission_id', $today_sale_permission->id],
+                                //             ['role_id', Auth::user()->role_id]
+                                //         ])->first();
 
-
+                                // $today_profit_permission = $permission_list->where('name', 'today_profit')->first();
+                                // $today_profit_permission_active = DB::table('role_has_permissions')->where([
+                                //             ['permission_id', $today_profit_permission->id],
+                                //             ['role_id', Auth::user()->role_id]
+                                //         ])->first();
+                            ?>
 
                             <li class="nav-item">
                                 <a href="" id="today-sale-btn" data-toggle="tooltip" title="{{trans('Today Sale')}}"><i class="dripicons-shopping-bag"></i></a>
                             </li>
-
                             <li class="nav-item">
                                 <a href="" id="today-profit-btn" data-toggle="tooltip" title="{{trans('Today Profit')}}"><i class="dripicons-graph-line"></i></a>
                             </li>
-
+                            {{-- @if(($alert_product + count(\Auth::user()->unreadNotifications)) > 0)
                             <li class="nav-item" id="notification-icon">
-                                  <a rel="nofollow" data-toggle="tooltip" title="{{__('Notifications')}}" class="nav-link dropdown-item"><i class="dripicons-bell"></i>
-                                    <span class="badge badge-danger notification-number">
-                                        unreadNotifications
-                                        {{-- {{$alert_product + count(\Auth::user()->unreadNotifications)}} --}}
-                                    </span>
+                                  <a rel="nofollow" data-toggle="tooltip" title="{{__('Notifications')}}" class="nav-link dropdown-item"><i class="dripicons-bell"></i><span class="badge badge-danger notification-number">{{$alert_product + count(\Auth::user()->unreadNotifications)}}</span>
                                       <span class="caret"></span>
                                       <span class="sr-only">Toggle Dropdown</span>
                                   </a>
                                   <ul class="right-sidebar" user="menu">
-                                      {{-- <li class="notifications">
-                                        <a href="{{route('superAdmin.report.qtyAlert')}}" class="btn btn-link">{{$alert_product}} product exceeds alert quantity</a>
-                                      </li> --}}
+                                      <li class="notifications">
+                                        <a href="{{route('report.qtyAlert')}}" class="btn btn-link">{{$alert_product}} product exceeds alert quantity</a>
+                                      </li>
                                       @foreach(\Auth::user()->unreadNotifications as $key => $notification)
                                           <li class="notifications">
                                               <a href="#" class="btn btn-link">{{ $notification->data['message'] }}</a>
@@ -515,13 +642,13 @@
                                       @endforeach
                                   </ul>
                             </li>
-
+                            @endif --}}
                             <li class="nav-item">
                                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                                 </a>
                                 <ul class="right-sidebar">
                                     {{-- <li>
-                                        <a href="{{route('superAdmin.user.profile', ['id' => Auth::id()])}}"><i class="dripicons-user"></i> {{trans('profile')}}</a>
+                                        <a href="{{route('user.profile', ['id' => Auth::id()])}}"><i class="dripicons-user"></i> {{trans('profile')}}</a>
                                     </li> --}}
 
                                     <li>
@@ -530,11 +657,11 @@
                                     <li>
                                         <a href="{{url('my-transactions/'.date('Y').'/'.date('m'))}}"><i class="dripicons-swap"></i> {{trans('My Transaction')}}</a>
                                     </li>
-
+                                    @if(Auth::user()->role_id != 5)
                                     <li>
-                                        <a href="{{ url('superAdmin.holidays.myHoliday/'.date('Y').'/'.date('m')) }}"><i class="dripicons-vibrate"></i> {{trans('My Holiday')}}</a>
+                                        <a href="{{url('superAdmin.holidays.myHoliday/'.date('Y').'/'.date('m'))}}"><i class="dripicons-vibrate"></i> {{trans('My Holiday')}}</a>
                                     </li>
-
+                                    @endif
                                     <li>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
@@ -564,10 +691,10 @@
                         <div class="row ml-2 mt-3">
                             @foreach($limscategorylist as $category)
                             <div class="col-md-3 category-img text-center" data-category="{{$category->id}}">
-                                @if($category->image)
-                                    <img  src="{{ asset('images/category', $category->image)}}" />
+                                @if($category->category_img)
+                                    <img  src="{{url('thumbnail', $category->category_img)}}" />
                                 @else
-                                    <img  src="{{ asset('images/product/zummXD2dvAtI.png')}}" />
+                                    <img  src="{{url('thumbnail/zummXD2dvAtI.png')}}" />
                                 @endif
                                 <p class="text-center">{{$category->name_en}}</p>
                             </div>
@@ -587,12 +714,12 @@
                             @foreach($limsbrandlist as $brand)
                             @if($brand->brand_image)
                                 <div class="col-md-3 brand-img text-center" data-brand="{{$brand->id}}">
-                                    <img  src="{{url('public/images/brand',$brand->image)}}" />
+                                    <img  src="{{url('thumbnail',$brand->brand_image)}}" />
                                     <p class="text-center">{{$brand->brand_name}}</p>
                                 </div>
                             @else
                                 <div class="col-md-3 brand-img" data-brand="{{$brand->id}}">
-                                    <img  src="{{url('public/images/product/zummXD2dvAtI.png')}}" />
+                                    <img  src="{{url('thumbnail/zummXD2dvAtI.png')}}" />
                                     <p class="text-center">{{$brand->brand_name}}</p>
                                 </div>
                             @endif
@@ -600,7 +727,7 @@
                         </div>
                     </div>
                 </div>
-          <div class="row">
+                <div class="row">
                     <div class="col-md-4">
                         <button class="btn btn-block btn-primary" id="category-filter">{{trans('category')}}</button>
                     </div>
@@ -624,12 +751,12 @@
                             <tbody>
                             @for ($i=0; $i < ceil($productnumber/5); $i++)
                                 <tr>
-                                    <td class="product-img sound-btn" title="{{$limsproductlist[0+$i*5]->product_name}}" data-product ="{{$limsproductlist[0+$i*5]->product_code . ' (' . $limsproductlist[0+$i*5]->product_name . ')'}}"><img  src="{{url('public/images/product',$limsproductlist[0+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$limsproductlist[0+$i*5]->product_name}}" data-product ="{{$limsproductlist[0+$i*5]->product_code . ' (' . $limsproductlist[0+$i*5]->product_name . ')'}}"><img  src="{{url('thumbnail',$limsproductlist[0+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$limsproductlist[0+$i*5]->product_name}}</p>
                                         <span>{{$limsproductlist[0+$i*5]->product_code}}</span>
                                     </td>
                                     @if(!empty($limsproductlist[1+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$limsproductlist[1+$i*5]->product_name}}" data-product ="{{$limsproductlist[1+$i*5]->product_code . ' (' . $limsproductlist[1+$i*5]->product_name . ')'}}"><img  src="{{url('public/images/product',$limsproductlist[1+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$limsproductlist[1+$i*5]->product_name}}" data-product ="{{$limsproductlist[1+$i*5]->product_code . ' (' . $limsproductlist[1+$i*5]->product_name . ')'}}"><img  src="{{url('thumbnail',$limsproductlist[1+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$limsproductlist[1+$i*5]->product_name}}</p>
                                         <span>{{$limsproductlist[1+$i*5]->product_code}}</span>
                                     </td>
@@ -637,7 +764,7 @@
                                     <td style="border:none;"></td>
                                     @endif
                                     @if(!empty($limsproductlist[2+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$limsproductlist[2+$i*5]->product_name}}" data-product ="{{$limsproductlist[2+$i*5]->product_code . ' (' . $limsproductlist[2+$i*5]->product_name . ')'}}"><img  src="{{url('public/images/product',$limsproductlist[2+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$limsproductlist[2+$i*5]->product_name}}" data-product ="{{$limsproductlist[2+$i*5]->product_code . ' (' . $limsproductlist[2+$i*5]->product_name . ')'}}"><img  src="{{url('thumbnail',$limsproductlist[2+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$limsproductlist[2+$i*5]->product_name}}</p>
                                         <span>{{$limsproductlist[2+$i*5]->product_code}}</span>
                                     </td>
@@ -645,7 +772,7 @@
                                     <td style="border:none;"></td>
                                     @endif
                                     @if(!empty($limsproductlist[3+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$limsproductlist[3+$i*5]->product_name}}" data-product ="{{$limsproductlist[3+$i*5]->product_code . ' (' . $limsproductlist[3+$i*5]->product_name . ')'}}"><img  src="{{url('public/images/product',$limsproductlist[3+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$limsproductlist[3+$i*5]->product_name}}" data-product ="{{$limsproductlist[3+$i*5]->product_code . ' (' . $limsproductlist[3+$i*5]->product_name . ')'}}"><img  src="{{url('thumbnail',$limsproductlist[3+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$limsproductlist[3+$i*5]->product_name}}</p>
                                         <span>{{$limsproductlist[3+$i*5]->product_code}}</span>
                                     </td>
@@ -653,7 +780,7 @@
                                     <td style="border:none;"></td>
                                     @endif
                                     @if(!empty($limsproductlist[4+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$limsproductlist[4+$i*5]->product_name}}" data-product ="{{$limsproductlist[4+$i*5]->product_code . ' (' . $limsproductlist[4+$i*5]->product_name . ')'}}"><img  src="{{url('public/images/product',$limsproductlist[4+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$limsproductlist[4+$i*5]->product_name}}" data-product ="{{$limsproductlist[4+$i*5]->product_code . ' (' . $limsproductlist[4+$i*5]->product_name . ')'}}"><img  src="{{url('thumbnail',$limsproductlist[4+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$limsproductlist[4+$i*5]->product_name}}</p>
                                         <span>{{$limsproductlist[4+$i*5]->product_code}}</span>
                                     </td>
@@ -690,14 +817,14 @@
                                         <label>{{trans('Unit Price')}}</label>
                                         <input type="text" name="edit_unit_price" class="form-control numkey" step="any">
                                     </div>
-                                    @php
+                                    <?php
                                         $tax_name_all[] = 'No Tax';
                                         $tax_rate_all[] = 0;
                                         foreach($limstaxlist as $tax) {
                                             $tax_name_all[] = $tax->name;
                                             $tax_rate_all[] = $tax->rate;
                                         }
-                                    @endphp
+                                    ?>
                                     <div class="col-md-4 form-group">
                                         <label>{{trans('Tax Rate')}}</label>
                                         <select name="edit_tax_rate" class="form-control selectpicker">
@@ -722,7 +849,7 @@
             <div id="addCustomer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
                 <div role="document" class="modal-dialog">
                   <div class="modal-content">
-                    {!! Form::open(['route' => 'superAdmin.customer.store', 'method' => 'post', 'files' => true]) !!}
+                    {!! Form::open(['route' => 'superAdmin.customer.store', 'method' => 'post', 'files' => true, 'id' => 'customer-form']) !!}
                     <div class="modal-header">
                       <h5 id="exampleModalLabel" class="modal-title">{{trans('Add Customer')}}</h5>
                       <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
@@ -758,8 +885,8 @@
                             <input type="text" name="city" required class="form-control">
                         </div>
                         <div class="form-group">
-                        <input type="hidden" name="pos" value="1">
-                          <input type="submit" value="{{trans('submit')}}" class="btn btn-primary">
+                            <input type="hidden" name="pos" value="1">
+                            <button type="button" class="btn btn-primary customer-submit-btn">{{trans('submit')}}</button>
                         </div>
                     </div>
                     {{ Form::close() }}
@@ -798,7 +925,7 @@
                                   </thead>
                                   <tbody>
                                     @foreach($recentsale as $sale)
-                                    @php $customer = DB::table('customers')->find($sale->customer_id); @endphp
+                                    <?php $customer = DB::table('customers')->find($sale->customer_id); ?>
                                     <tr>
                                       <td>{{date('d-m-Y', strtotime($sale->created_at))}}</td>
                                       <td>{{$sale->reference_no}}</td>
@@ -807,7 +934,6 @@
                                       <td>
                                         <div class="btn-group">
                                             <a href="{{ route('superAdmin.sale.edit', $sale->id) }}" class="btn btn-success btn-sm" title="Edit"><i class="dripicons-document-edit"></i></a>&nbsp;
-
                                             {{ Form::open(['route' => ['superAdmin.sale.deleted', $sale->id], 'method' => 'POST'] ) }}
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirmDelete()" title="Delete"><i class="dripicons-trash"></i></button>
                                             {{ Form::close() }}
@@ -833,7 +959,7 @@
                                   </thead>
                                   <tbody>
                                     @foreach($recentdraft as $draft)
-                                    @php $customer = DB::table('customers')->find($draft->customer_id); @endphp
+                                    <?php $customer = DB::table('customers')->find($draft->customer_id); ?>
                                     <tr>
                                       <td>{{date('d-m-Y', strtotime($draft->created_at))}}</td>
                                       <td>{{$draft->reference_no}}</td>
@@ -841,10 +967,14 @@
                                       <td>{{$draft->grand_total}}</td>
                                       <td>
                                         <div class="btn-group">
-                                            <a href="{{url('superAdmin/sale/'.$draft->id.'/create') }}" class="btn btn-success btn-sm" title="Edit"><i class="dripicons-document-edit"></i></a>&nbsp;
-                                            {{ Form::open(['route' => ['superAdmin.sale.deleted', $draft->id], 'method' => 'POST'] ) }}
+                                            @if(in_array("sales-edit", $all_permission))
+                                            <a href="{{url('sales/'.$draft->id.'/create') }}" class="btn btn-success btn-sm" title="Edit"><i class="dripicons-document-edit"></i></a>&nbsp;
+                                            @endif
+                                            @if(in_array("sales-delete", $all_permission))
+                                            {{ Form::open(['route' => ['sales.destroy', $draft->id], 'method' => 'DELETE'] ) }}
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirmDelete()" title="Delete"><i class="dripicons-trash"></i></button>
                                             {{ Form::close() }}
+                                            @endif
                                         </div>
                                       </td>
                                     </tr>
@@ -880,7 +1010,7 @@
                           </div>
                           <div class="col-md-6 form-group">
                               <label>{{trans('Cash in Hand')}} *</strong> </label>
-                              <input type="number" name="cash_in_hand" required class="form-control">
+                              <input type="number" step="any" name="cash_in_hand" required class="form-control">
                           </div>
                           <div class="col-md-12 form-group">
                               <button type="submit" class="btn btn-primary">{{trans('submit')}}</button>
@@ -917,30 +1047,42 @@
                                           <td>{{trans('Total Payment')}}:</td>
                                           <td id="total_payment" class="text-right"></td>
                                         </tr>
+                                        @if(in_array("cash",$options))
                                         <tr>
                                           <td>{{trans('Cash Payment')}}:</td>
                                           <td id="cash_payment" class="text-right"></td>
                                         </tr>
+                                        @endif
+                                        @if(in_array("card",$options))
                                         <tr>
                                           <td>{{trans('Credit Card Payment')}}:</td>
                                           <td id="credit_card_payment" class="text-right"></td>
                                         </tr>
+                                        @endif
+                                        @if(in_array("cheque",$options))
                                         <tr>
                                           <td>{{trans('Cheque Payment')}}:</td>
                                           <td id="cheque_payment" class="text-right"></td>
                                         </tr>
+                                        @endif
+                                        @if(in_array("gift_card",$options))
                                         <tr>
                                           <td>{{trans('Gift Card Payment')}}:</td>
                                           <td id="gift_card_payment" class="text-right"></td>
                                         </tr>
+                                        @endif
+                                        @if(in_array("deposit",$options))
                                         <tr>
                                           <td>{{trans('Deposit Payment')}}:</td>
                                           <td id="deposit_payment" class="text-right"></td>
                                         </tr>
+                                        @endif
+                                        @if(in_array("paypal",$options) && (strlen(env('PAYPAL_LIVE_API_USERNAME'))>0) && (strlen(env('PAYPAL_LIVE_API_PASSWORD'))>0) && (strlen(env('PAYPAL_LIVE_API_SECRET'))>0))
                                         <tr>
                                           <td>{{trans('Paypal Payment')}}:</td>
                                           <td id="paypal_payment" class="text-right"></td>
                                         </tr>
+                                        @endif
                                         <tr>
                                           <td>{{trans('Total Sale Return')}}:</td>
                                           <td id="total_sale_return" class="text-right"></td>
@@ -1006,10 +1148,12 @@
                                           <td>{{trans('Deposit Payment')}}:</td>
                                           <td class="deposit_payment text-right"></td>
                                         </tr>
+                                        @if(in_array("paypal",$options) && (strlen(env('PAYPAL_LIVE_API_USERNAME'))>0) && (strlen(env('PAYPAL_LIVE_API_PASSWORD'))>0) && (strlen(env('PAYPAL_LIVE_API_SECRET'))>0))
                                         <tr>
                                           <td>{{trans('Paypal Payment')}}:</td>
                                           <td class="paypal_payment text-right"></td>
                                         </tr>
+                                        @endif
                                         <tr>
                                           <td>{{trans('Total Payment')}}:</td>
                                           <td class="total_payment text-right"></td>
@@ -1084,9 +1228,9 @@
 </section>
 
 
+@push('scripts')
 
 <script type="text/javascript">
-alert("kk");
 
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
@@ -1130,7 +1274,7 @@ var temp_unit_operation_value = [];
 var deposit = @php echo json_encode($deposit) @endphp;
 var points = @php echo json_encode($points) @endphp;
 var reward_point_setting = @php echo json_encode($limsrewardpointsettingdata) @endphp;
-@if(!empty($$limspossettingdata->productnumber))
+@if(!empty($limspossettingdata->productnumber))
 var product_row_number = @php echo json_encode($limspossettingdata->productnumber) @endphp;
 @else
 @endif
@@ -1603,9 +1747,9 @@ function populateProduct(data) {
         $.each(data['product_name'], function(index) {
             var product_info = data['product_code'][index]+' (' + data['product_name'][index] + ')';
             if(index % 5 == 0 && index != 0)
-                tableData += '</tr><tr><td class="product-img sound-btn" title="'+data['product_name'][index]+'" data-product = "'+product_info+'"><img  src="public/images/product/'+data['product_image'][index]+'" width="100%" /><p>'+data['product_name'][index]+'</p><span>'+data['product_code'][index]+'</span></td>';
+                tableData += '</tr><tr><td class="product-img sound-btn" title="'+data['product_name'][index]+'" data-product = "'+product_info+'"><img  src="{{ asset('/') }}thumbnail/'+data['product_image'][index]+'" width="100%" /><p>'+data['product_name'][index]+'</p><span>'+data['product_code'][index]+'</span></td>';
             else
-                tableData += '<td class="product-img sound-btn" title="'+data['product_name'][index]+'" data-product = "'+product_info+'"><img  src="public/images/product/'+data['product_image'][index]+'" width="100%" /><p>'+data['product_name'][index]+'</p><span>'+data['product_code'][index]+'</span></td>';
+                tableData += '<td class="product-img sound-btn" title="'+data['product_name'][index]+'" data-product = "'+product_info+'"><img  src="{{ asset('/') }}thumbnail/'+data['product_image'][index]+'" width="100%" /><p>'+data['product_name'][index]+'</p><span>'+data['product_code'][index]+'</span></td>';
         });
 
         if(data['product_name'].length % 5){
@@ -2185,7 +2329,7 @@ function addNewProduct(data){
     temp_unit_name = (data[6]).split(',');
     pos = product_code.indexOf(data[1]);
 
-    cols += '<td class="col-sm-2 product-title"><button type="button" class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal"><span style="margin-left: -19px; white-space: break-spaces;"><strong>' + data[0] + '</strong></span></button><br>' + data[1] + '<p>In Stockssssss: <span class="in-stock"></span></p></td>';
+    cols += '<td class="col-sm-2 product-title"><button type="button" class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal"><span style="margin-left: -19px; white-space: break-spaces;"><strong>' + data[0] + '</strong></span> &nbsp; <i class="dripicons-document-edit"></i> </button><br>' + data[1] + '<p>In Stockss: <span class="in-stock"></span></p></td>';
     if(data[12]) {
         cols += '<td class="col-sm-2"><input type="text" class="form-control batch-no" value="'+batch_no[pos]+'" required/> <input type="hidden" class="product-batch-id" name="product_batch_id[]" value="'+product_batch_id[pos]+'"/> </td>';
     }
@@ -2717,4 +2861,4 @@ $('#product-table').DataTable( {
 });
 </script>
 <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
-
+@endpush

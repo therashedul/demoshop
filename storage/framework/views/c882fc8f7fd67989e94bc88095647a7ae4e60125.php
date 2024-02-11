@@ -64,7 +64,7 @@
                            
                                 
                                 
-                                <div class="col-md-6 d-none">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label><?php echo e(trans('Theme')); ?> *</label>
                                         <div class="row ml-1">
@@ -206,6 +206,7 @@
     }
 
     $('.theme-option').on('click', function() {
+        alert("kk");
         $.get('general_setting/change-theme/' + $(this).data('color'), function(data) {
         });
         var style_link= $('#custom-style').attr('href').replace(/([^-]*)$/, $(this).data('color') );
